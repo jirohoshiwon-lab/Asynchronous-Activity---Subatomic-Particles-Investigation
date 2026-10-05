@@ -1985,9 +1985,9 @@ function restoreCodes(){
   revealedCodes=saved.length;
 }
 function progress(){
-  if(state.day4Completed)return 100;
-  if(state.day3Completed)return 76;
-  if(state.day2Completed)return 42;
+  if(state.day3Completed)return 100;
+  if(state.day2Completed)return 76;
+  if(state.day1Completed)return 42;
   const done=Object.keys(state.activities).length;
   return Math.min(38,Math.round(done/8*38));
 }

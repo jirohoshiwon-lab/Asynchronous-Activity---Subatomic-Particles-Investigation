@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Atom Investigation</title>
 <!-- Google Apps Script submission endpoint configured:
-   https://script.google.com/macros/s/AKfycbxaaPYMPIOdNIacPoWXJYBUlE0D4O-fcPMBHJnGa602FxHqPX2t_gLxQzYS3Lhmw56Efw/exec
+     https://script.google.com/macros/s/AKfycbxr-yAlnsvAcZnEGC0Q3qACQXtaqTq655QKZwK_NWFxqM62fF3tHPxZH9zwdobmM9RKEw/exec
      IMPORTANT: Deploy the Apps Script web app with access settings that permit student browsers to call it.
      The browser uses no-cors POST requests, so "sent" means the request was dispatched, not independently verified. -->
 <!-- GitHub Pages classroom build with client-side Teacher Access.
@@ -881,6 +881,33 @@ input:hover,select:hover,textarea:hover{
   .isotope-tile{margin:auto}
 }
 
+
+/* ===== v22 discreet teacher controls ===== */
+.teacher-corner{
+  display:flex;
+  justify-content:flex-end;
+  gap:6px;
+  margin-top:10px;
+  opacity:.34;
+  transition:opacity .2s ease;
+}
+.teacher-corner:hover{opacity:.72}
+.teacher-corner-btn{
+  width:30px;height:30px;border-radius:999px;
+  border:1px solid rgba(126,174,204,.22);
+  background:rgba(8,22,36,.55);
+  color:#7d9fb5;
+  font-size:.68rem;font-weight:800;
+  letter-spacing:.04em;
+  cursor:pointer;
+  box-shadow:none;
+}
+.teacher-corner-btn:hover{
+  color:#ccefff;
+  border-color:rgba(87,202,255,.42);
+  background:#0b2034;
+}
+
 </style>
 </head>
 <body>
@@ -948,11 +975,14 @@ input:hover,select:hover,textarea:hover{
       <div class="actions">
         <button class="primary" onclick="beginInvestigation()">BEGIN / RESUME INVESTIGATION</button>
         <button class="ghost" onclick="openPassword()">I HAVE A DAY PASSWORD</button>
-        <button class="ghost" onclick="openTeacherPreview()">TEACHER PREVIEW</button>
-        <button class="ghost" onclick="openTeacherAccess()">TEACHER ACCESS</button>
       </div>
       <div class="science-note" style="margin-top:14px"><b>Automatic saving:</b> Your answers and completed activities are saved under your <b>section + name</b> on this device. At the end of each day, you will receive a password for the next day. After Day 4, you will receive a screenshot-ready <b>3-Day Completion Card</b>.</div>
-      <div class="note" style="margin-top:12px"><b>Student reminder:</b> Your final 3-Day Completion Card is your proof of completion. Teacher records are protected behind Teacher Access.</div>
+      <div class="note" style="margin-top:12px"><b>Student reminder:</b> Your final 3-Day Completion Card is your proof of completion.</div>
+
+      <div class="teacher-corner" aria-label="Teacher tools">
+        <button class="teacher-corner-btn" onclick="openTeacherPreview()" title="Teacher Preview">TP</button>
+        <button class="teacher-corner-btn" onclick="openTeacherAccess()" title="Teacher Access">TA</button>
+      </div>
     </div>
   </div>
 </section>

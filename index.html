@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Atom Investigation</title>
 <!-- Google Apps Script submission endpoint configured:
-    https://script.google.com/macros/s/AKfycbxaaPYMPIOdNIacPoWXJYBUlE0D4O-fcPMBHJnGa602FxHqPX2t_gLxQzYS3Lhmw56Efw/exec
+     https://script.google.com/macros/s/AKfycbxr-yAlnsvAcZnEGC0Q3qACQXtaqTq655QKZwK_NWFxqM62fF3tHPxZH9zwdobmM9RKEw/exec
      IMPORTANT: Deploy the Apps Script web app with access settings that permit student browsers to call it.
      The browser uses no-cors POST requests, so "sent" means the request was dispatched, not independently verified. -->
 <!-- GitHub Pages classroom build with client-side Teacher Access.
@@ -121,6 +121,16 @@ textarea{min-height:120px;resize:vertical}
   content:"NUCLEUS";position:absolute;bottom:-28px;font-size:.72rem;font-weight:900;
   letter-spacing:.18em;color:#ffd7a1
 }
+.nucleus-center-glow{
+  position:absolute;width:68px;height:68px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,208,112,.45),rgba(255,208,112,.12) 60%,transparent 72%);
+  box-shadow:0 0 24px rgba(255,208,112,.18);
+  transition:.45s ease;pointer-events:none;
+}
+.nucleus-reveal{
+  position:relative;display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;
+  opacity:0;transform:scale(.72);transition:.45s ease;pointer-events:none;
+}
 .model-particle{
   width:50px;height:50px;border-radius:50%;display:grid;place-items:center;font-weight:950;
   border:2px solid rgba(255,255,255,.75);box-shadow:0 10px 24px rgba(0,0,0,.28);
@@ -133,11 +143,15 @@ textarea{min-height:120px;resize:vertical}
   box-shadow:0 0 24px rgba(251,113,133,.42)
 }
 .visual-key{
-  position:absolute;left:14px;bottom:12px;display:flex;gap:8px;flex-wrap:wrap;z-index:6
+  position:absolute;left:14px;bottom:12px;display:flex;gap:8px;flex-wrap:wrap;z-index:6;
+  opacity:0;transform:translateY(8px);transition:.35s ease
 }
 .visual-key .chip{background:rgba(6,17,31,.72)}
 .zoomed .atom-cloud{width:400px;height:290px;opacity:.78}
 .zoomed .model-nucleus{width:200px;height:200px}
+.zoomed .nucleus-center-glow{opacity:0;transform:scale(.7)}
+.zoomed .nucleus-reveal{opacity:1;transform:scale(1)}
+.zoomed .visual-key{opacity:1;transform:translateY(0)}
 @keyframes cloudBreathe{0%,100%{transform:scale(.96);opacity:.75}50%{transform:scale(1.05);opacity:1}}
 @keyframes nucleusFloat{0%,100%{translate:0 0}50%{translate:0 -8px}}
 @keyframes particleA{0%,100%{transform:translate(-4px,3px)}50%{transform:translate(5px,-5px)}}
@@ -235,17 +249,666 @@ hr{border:none;border-top:1px solid var(--line);margin:26px 0}
 .teacher-stat b{display:block;font-size:1.7rem;margin-top:4px}
 @media(max-width:700px){.teacher-dashboard-grid{grid-template-columns:1fr}}
 
+
+/* ===== v12 UI depth + modal scrolling improvements ===== */
+
+/* More dimensional page surfaces */
+.card,.mission,.result-card,.atom-stage{
+  position:relative;
+  overflow:hidden;
+  box-shadow:
+    0 18px 42px rgba(0,0,0,.24),
+    inset 0 1px 0 rgba(255,255,255,.035);
+}
+.card::before,.mission::before,.result-card::before,.atom-stage::before{
+  content:"";
+  position:absolute;
+  inset:0 0 auto 0;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(57,213,255,.32),transparent);
+  pointer-events:none;
+}
+.card{
+  transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease;
+}
+.card:hover{
+  transform:translateY(-2px);
+  border-color:#2f688b;
+  box-shadow:
+    0 24px 54px rgba(0,0,0,.30),
+    0 0 0 1px rgba(57,213,255,.04);
+}
+.mission{
+  background:
+    radial-gradient(circle at 100% 0,rgba(57,213,255,.11),transparent 30%),
+    linear-gradient(155deg,rgba(16,38,61,.98),rgba(7,23,38,.98));
+}
+.mission::after{
+  content:"";
+  position:absolute;
+  width:140px;height:140px;border-radius:50%;
+  right:-80px;top:-80px;
+  border:1px solid rgba(57,213,255,.16);
+  box-shadow:0 0 0 22px rgba(57,213,255,.025),0 0 0 44px rgba(57,213,255,.018);
+  pointer-events:none;
+}
+.section-title .num{
+  box-shadow:
+    0 8px 24px rgba(14,165,233,.22),
+    inset 0 1px 0 rgba(255,255,255,.15);
+  background:linear-gradient(145deg,#164d72,#0a2e49);
+}
+.section-title h2,.section-title h3{
+  text-shadow:0 5px 20px rgba(0,0,0,.25);
+}
+
+/* Buttons feel more tactile */
+.primary,.ghost,.smallbtn,.choice,.particle-token,.code-card,.navbtn{
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.055),0 7px 18px rgba(0,0,0,.12);
+}
+.primary{
+  box-shadow:
+    0 12px 26px rgba(14,165,233,.22),
+    inset 0 1px 0 rgba(255,255,255,.22);
+}
+.primary:hover{
+  box-shadow:
+    0 16px 32px rgba(14,165,233,.30),
+    inset 0 1px 0 rgba(255,255,255,.24);
+}
+button:active{
+  transform:translateY(1px) scale(.99)!important;
+}
+.choice:hover,.code-card:hover{
+  background:#0e2942;
+}
+
+/* Inputs become clearer against cards */
+input,select,textarea{
+  box-shadow:inset 0 2px 8px rgba(0,0,0,.18);
+}
+input:hover,select:hover,textarea:hover{
+  border-color:#356b8d;
+}
+
+/* Stronger visual progress */
+.progressline{
+  box-shadow:inset 0 1px 6px rgba(0,0,0,.45);
+}
+.progressbar{
+  box-shadow:0 0 18px rgba(57,213,255,.42);
+}
+
+/* Completion cards feel celebratory instead of flat */
+.completion-card{
+  position:relative;
+  isolation:isolate;
+  overflow:hidden;
+  border:1px solid rgba(87,202,255,.62);
+  background:
+    radial-gradient(circle at 88% 8%,rgba(57,213,255,.22),transparent 27%),
+    radial-gradient(circle at 10% 92%,rgba(59,130,246,.16),transparent 30%),
+    linear-gradient(145deg,#0a2238 0%,#071827 58%,#0b2034 100%);
+  box-shadow:
+    0 30px 90px rgba(0,0,0,.48),
+    0 0 0 1px rgba(57,213,255,.06),
+    inset 0 1px 0 rgba(255,255,255,.07);
+}
+.completion-card::before{
+  content:"";
+  position:absolute;
+  inset:-2px;
+  z-index:-1;
+  background:
+    radial-gradient(circle at 8% 8%,rgba(246,211,101,.8) 0 2px,transparent 3px),
+    radial-gradient(circle at 18% 18%,rgba(57,213,255,.8) 0 2px,transparent 3px),
+    radial-gradient(circle at 82% 17%,rgba(74,222,128,.8) 0 2px,transparent 3px),
+    radial-gradient(circle at 92% 30%,rgba(251,113,133,.75) 0 2px,transparent 3px),
+    radial-gradient(circle at 74% 86%,rgba(246,211,101,.7) 0 2px,transparent 3px),
+    radial-gradient(circle at 28% 88%,rgba(57,213,255,.7) 0 2px,transparent 3px);
+  opacity:.52;
+  pointer-events:none;
+}
+.completion-card h2{
+  font-size:clamp(1.65rem,4vw,2.5rem);
+  letter-spacing:-.025em;
+  background:linear-gradient(90deg,#fff,#bceeff,#f7e8a7);
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+.completion-card > .kicker{
+  display:inline-flex;
+  padding:7px 10px;
+  border:1px solid rgba(57,213,255,.30);
+  border-radius:999px;
+  background:rgba(7,24,39,.72);
+}
+
+/* IMPORTANT: tall dialogs must always be scrollable */
+.modal{
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  overflow-y:auto;
+  overflow-x:hidden;
+  overscroll-behavior:contain;
+  -webkit-overflow-scrolling:touch;
+  padding:
+    max(18px,env(safe-area-inset-top))
+    18px
+    max(28px,env(safe-area-inset-bottom));
+}
+.modal-box{
+  flex:0 0 auto;
+  margin:auto 0;
+  max-height:none;
+  overflow:visible;
+  box-shadow:
+    0 30px 90px rgba(0,0,0,.48),
+    inset 0 1px 0 rgba(255,255,255,.05);
+}
+.completion-modal .modal-box{
+  width:min(100%,820px);
+  max-width:820px;
+}
+
+/* Sticky actions stay reachable while reviewing long completion cards */
+.completion-modal .modal-box > .actions{
+  position:sticky;
+  bottom:-1px;
+  z-index:10;
+  margin:16px -24px -24px;
+  padding:14px 24px 18px;
+  background:linear-gradient(180deg,rgba(10,29,49,.05),rgba(10,29,49,.97) 28%);
+  border-top:1px solid rgba(57,213,255,.10);
+  backdrop-filter:blur(10px);
+}
+
+/* Better scrollbars for modal/table areas */
+.modal::-webkit-scrollbar,.tablewrap::-webkit-scrollbar{width:10px;height:10px}
+.modal::-webkit-scrollbar-thumb,.tablewrap::-webkit-scrollbar-thumb{
+  background:#285a78;border-radius:999px;border:2px solid #081522;
+}
+.modal::-webkit-scrollbar-track,.tablewrap::-webkit-scrollbar-track{background:#07111c}
+
+/* Mobile layout: maximize usable viewport */
+@media(max-width:600px){
+  .modal{
+    padding:
+      max(8px,env(safe-area-inset-top))
+      8px
+      max(14px,env(safe-area-inset-bottom));
+  }
+  .modal-box{
+    border-radius:16px;
+    padding:14px;
+  }
+  .completion-modal .modal-box > .actions{
+    margin:14px -14px -14px;
+    padding:12px 14px max(14px,env(safe-area-inset-bottom));
+  }
+  .completion-card{
+    padding:18px 14px;
+    border-radius:16px;
+  }
+  .completion-card .grid2,.completion-card .grid3{
+    gap:10px;
+  }
+  .completion-card .card{
+    padding:14px;
+  }
+  .completion-card .subtitle{
+    font-size:1.05rem;
+    overflow-wrap:anywhere;
+  }
+  .password-box{
+    overflow-wrap:anywhere;
+  }
+  .actions > button{
+    flex:1 1 150px;
+  }
+}
+
+/* Entrance polish */
+@keyframes screenRise{
+  from{opacity:0;transform:translateY(8px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.screen:not(.hidden){
+  animation:screenRise .28s ease both;
+}
+@media (prefers-reduced-motion: reduce){
+  .screen:not(.hidden){animation:none!important}
+  .card:hover{transform:none}
+}
+
+
+/* ===== v13 completion-card redesign ===== */
+.completion-card{
+  border-radius:26px;
+  border:1px solid rgba(114,226,255,.55);
+  background:
+    radial-gradient(circle at 12% 14%,rgba(246,211,101,.13),transparent 18%),
+    radial-gradient(circle at 88% 10%,rgba(57,213,255,.18),transparent 22%),
+    radial-gradient(circle at 84% 85%,rgba(74,222,128,.10),transparent 20%),
+    linear-gradient(145deg,#071827 0%,#0b2136 45%,#091c2e 100%);
+  padding:26px 22px 20px;
+}
+.completion-shell{
+  position:relative;
+  border-radius:22px;
+  border:1px solid rgba(255,255,255,.08);
+  background:
+    linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.015)),
+    rgba(6,18,30,.72);
+  padding:22px 18px 18px;
+  overflow:hidden;
+}
+.completion-shell::before{
+  content:"";
+  position:absolute;
+  inset:10px;
+  border-radius:18px;
+  border:1px dashed rgba(87,202,255,.16);
+  pointer-events:none;
+}
+.completion-shell::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at 18% 18%,rgba(255,255,255,.07) 0 2px,transparent 3px),
+    radial-gradient(circle at 82% 22%,rgba(255,255,255,.06) 0 2px,transparent 3px),
+    radial-gradient(circle at 70% 80%,rgba(255,255,255,.05) 0 2px,transparent 3px),
+    radial-gradient(circle at 24% 76%,rgba(255,255,255,.05) 0 2px,transparent 3px);
+  opacity:.55;
+  pointer-events:none;
+}
+.completion-topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:18px;
+}
+.completion-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:9px 14px;
+  border-radius:999px;
+  border:1px solid rgba(246,211,101,.34);
+  background:linear-gradient(180deg,rgba(246,211,101,.12),rgba(246,211,101,.04));
+  color:#ffe9a3;
+  font-weight:800;
+  letter-spacing:.03em;
+}
+.completion-status{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:9px 14px;
+  border-radius:999px;
+  border:1px solid rgba(74,222,128,.34);
+  background:linear-gradient(180deg,rgba(74,222,128,.13),rgba(74,222,128,.04));
+  color:#b7ffd0;
+  font-weight:800;
+}
+.completion-hero{
+  text-align:center;
+  position:relative;
+  z-index:1;
+  padding:10px 6px 18px;
+}
+.completion-hero .hero-icon{
+  font-size:2.35rem;
+  line-height:1;
+  margin-bottom:10px;
+  filter:drop-shadow(0 8px 18px rgba(246,211,101,.18));
+}
+.completion-hero .hero-sub{
+  color:#a7d2ec;
+  margin:.3rem auto 0;
+  max-width:680px;
+  line-height:1.55;
+}
+.completion-student-name{
+  margin:18px auto 6px;
+  font-size:clamp(1.5rem,4.3vw,2.35rem);
+  font-weight:900;
+  letter-spacing:.01em;
+  color:#ffffff;
+  text-shadow:0 8px 24px rgba(0,0,0,.26);
+  overflow-wrap:anywhere;
+}
+.completion-section-chip{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:8px 14px;
+  border-radius:999px;
+  border:1px solid rgba(57,213,255,.28);
+  background:rgba(9,34,55,.82);
+  color:#cbefff;
+  font-weight:700;
+}
+.completion-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+  margin-top:16px;
+  position:relative;
+  z-index:1;
+}
+.completion-metric{
+  border-radius:18px;
+  padding:16px;
+  border:1px solid rgba(57,213,255,.12);
+  background:linear-gradient(180deg,rgba(10,31,51,.88),rgba(7,22,36,.92));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.04),0 12px 28px rgba(0,0,0,.18);
+}
+.completion-metric .metric-label{
+  color:#9ccce8;
+  font-size:.85rem;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  margin-bottom:6px;
+}
+.completion-metric .metric-value{
+  font-size:1.15rem;
+  font-weight:800;
+  color:#fff;
+  overflow-wrap:anywhere;
+}
+.mastery-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  margin-top:10px;
+  padding:8px 12px;
+  border-radius:999px;
+  border:1px solid rgba(57,213,255,.18);
+  background:rgba(8,27,44,.76);
+  color:#ccefff;
+  font-weight:700;
+}
+.mastery-meter{
+  margin-top:12px;
+  height:12px;
+  border-radius:999px;
+  background:#0e263a;
+  border:1px solid rgba(255,255,255,.06);
+}
+.mastery-meter span{
+  background:linear-gradient(90deg,#38bdf8,#22d3ee,#f6d365);
+}
+.completion-days{
+  margin-top:16px;
+  position:relative;
+  z-index:1;
+}
+.completion-days h3{
+  margin-bottom:10px;
+}
+.day-timeline{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:12px;
+}
+.day-step{
+  position:relative;
+  border-radius:18px;
+  padding:16px 14px;
+  border:1px solid rgba(255,255,255,.08);
+  background:linear-gradient(180deg,rgba(10,33,53,.92),rgba(6,21,34,.92));
+}
+.day-step .step-kicker{
+  color:#90c7e6;
+  font-size:.8rem;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  margin-bottom:6px;
+}
+.day-step .step-title{
+  font-size:1.02rem;
+  font-weight:800;
+  color:#fff;
+}
+.day-step .step-time{
+  margin-top:8px;
+  color:#c4e9ff;
+  line-height:1.45;
+}
+.day-step::before{
+  content:"✔";
+  position:absolute;
+  top:12px;right:12px;
+  width:26px;height:26px;border-radius:50%;
+  display:grid;place-items:center;
+  background:linear-gradient(180deg,#10b981,#059669);
+  color:white;
+  font-weight:900;
+  box-shadow:0 8px 20px rgba(16,185,129,.22);
+}
+.completion-footer-note{
+  margin-top:16px;
+  position:relative;
+  z-index:1;
+}
+.completion-footer-note .science-note,
+.completion-footer-note .password-box{
+  margin-top:0;
+}
+.certificate-ribbon{
+  position:absolute;
+  top:18px;
+  right:-34px;
+  transform:rotate(30deg);
+  padding:8px 46px;
+  background:linear-gradient(180deg,#f6d365,#f0b84f);
+  color:#362400;
+  font-weight:900;
+  letter-spacing:.08em;
+  box-shadow:0 14px 30px rgba(0,0,0,.25);
+}
+@media(max-width:760px){
+  .completion-grid,
+  .day-timeline{grid-template-columns:1fr}
+  .completion-topbar{justify-content:center}
+  .certificate-ribbon{
+    top:12px;right:-48px;font-size:.78rem;padding:7px 48px;
+  }
+}
+
+
+/* ===== v15 atmosphere + periodic tiles + detective refresh ===== */
+.electron-bg{
+  position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:-1;opacity:.85
+}
+.bg-electron{
+  position:absolute;width:10px;height:10px;border-radius:50%;
+  background:radial-gradient(circle at 35% 35%,#d8f7ff,#59d9ff 55%,#14789e 100%);
+  box-shadow:0 0 18px rgba(57,213,255,.35);
+  opacity:.45;animation:electronFloat linear infinite;
+}
+.bg-electron::after{
+  content:"";position:absolute;inset:-6px;border-radius:50%;
+  border:1px solid rgba(57,213,255,.14)
+}
+@keyframes electronFloat{
+  0%{transform:translate3d(0,0,0) scale(.9)}
+  25%{transform:translate3d(40px,-90px,0) scale(1)}
+  50%{transform:translate3d(-50px,-180px,0) scale(.95)}
+  75%{transform:translate3d(35px,-260px,0) scale(1.02)}
+  100%{transform:translate3d(-20px,-360px,0) scale(.9)}
+}
+.sound-toggle{min-width:122px}
+
+/* More particles in the conceptual model */
+.model-particle.small{
+  width:38px;height:38px;font-size:.95rem
+}
+.model-particle.electron{
+  width:34px;height:34px;font-size:.9rem
+}
+.nucleus-reveal{max-width:148px}
+.zoomed .nucleus-reveal{max-width:170px}
+.visual-key .chip strong{color:#fff}
+
+/* Detective activity redesign */
+.evidence-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.evidence-card{
+  border-radius:18px;padding:16px;border:1px solid var(--line);
+  background:
+    radial-gradient(circle at 100% 0,rgba(57,213,255,.08),transparent 24%),
+    linear-gradient(180deg,rgba(12,35,57,.96),rgba(7,24,39,.96));
+  box-shadow:0 16px 34px rgba(0,0,0,.18)
+}
+.evidence-top{
+  display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px
+}
+.evidence-top .tag{
+  display:inline-flex;padding:6px 10px;border-radius:999px;background:#0c2a43;border:1px solid #23506c;font-weight:800;font-size:.82rem
+}
+.charge-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  min-width:34px;height:34px;border-radius:999px;font-weight:900;border:1px solid rgba(255,255,255,.18)
+}
+.charge-plus{background:rgba(96,165,250,.15);color:#beddff}
+.charge-zero{background:rgba(246,211,101,.12);color:#ffe79b}
+.charge-minus{background:rgba(251,113,133,.14);color:#ffc3cf}
+.suspect-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-top:12px}
+.particle-choice{
+  width:100%;text-align:left;padding:12px 14px;border-radius:14px;border:1px solid #244b66;
+  background:#091d30;color:var(--text);font-weight:700;cursor:pointer;transition:.2s ease
+}
+.particle-choice:hover{transform:translateY(-1px);border-color:var(--cyan);background:#0d263d}
+.particle-choice.selected{outline:2px solid var(--cyan);background:#12314d}
+.particle-choice .sub{display:block;font-weight:500;font-size:.86rem;color:var(--muted);margin-top:2px}
+.selection-line{margin-top:10px;color:#ccefff;font-size:.94rem}
+@media(max-width:900px){.evidence-grid{grid-template-columns:1fr}}
+
+/* Periodic-table style tile */
+.pt-wrap{
+  display:grid;grid-template-columns:160px 1fr;gap:16px;align-items:stretch;margin-top:12px
+}
+.pt-tile{
+  position:relative;border-radius:20px;padding:12px 12px 14px;
+  border:1px solid rgba(87,202,255,.42);
+  background:
+    radial-gradient(circle at 82% 15%,rgba(57,213,255,.16),transparent 25%),
+    linear-gradient(160deg,#0e3553,#0a2238 58%,#081929);
+  box-shadow:0 20px 42px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.05);
+  min-height:178px;display:flex;flex-direction:column;justify-content:space-between
+}
+.pt-atomic{
+  font-weight:900;font-size:1.1rem;color:#d3f1ff
+}
+.pt-mass{
+  position:absolute;top:12px;right:12px;font-weight:800;color:#ffe5a0
+}
+.pt-symbol{
+  font-size:3rem;font-weight:900;line-height:1;text-align:center;color:#fff;letter-spacing:.03em;
+  text-shadow:0 8px 18px rgba(0,0,0,.28)
+}
+.pt-name{text-align:center;font-weight:800;color:#d6f2ff}
+.pt-class{text-align:center;font-size:.85rem;color:#9fd2ee}
+.pt-facts{
+  border-radius:18px;padding:14px 16px;border:1px solid rgba(57,213,255,.10);
+  background:linear-gradient(180deg,rgba(10,31,51,.90),rgba(7,22,36,.92))
+}
+.pt-facts .facts-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.pt-fact{
+  border-radius:14px;padding:12px;border:1px solid rgba(255,255,255,.06);background:#0a2237
+}
+.pt-fact b{display:block;color:#9dd2ec;font-size:.83rem;margin-bottom:4px;text-transform:uppercase;letter-spacing:.04em}
+@media(max-width:700px){
+  .pt-wrap{grid-template-columns:1fr}
+  .pt-tile{min-height:0}
+  .pt-facts .facts-grid{grid-template-columns:1fr}
+}
+
+
+/* ===== v18 reusable isotope tiles ===== */
+.isotope-tile{
+  position:relative;
+  width:132px;min-width:132px;min-height:150px;
+  border-radius:18px;padding:11px 11px 12px;
+  border:1px solid rgba(87,202,255,.42);
+  background:
+    radial-gradient(circle at 82% 15%,rgba(57,213,255,.16),transparent 25%),
+    linear-gradient(160deg,#0e3553,#0a2238 58%,#081929);
+  box-shadow:0 16px 34px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.05);
+  display:flex;flex-direction:column;justify-content:space-between;
+}
+.isotope-tile .iso-z{font-size:1rem;font-weight:900;color:#d3f1ff}
+.isotope-tile .iso-a{position:absolute;top:11px;right:11px;font-weight:900;color:#ffe5a0}
+.isotope-tile .iso-symbol{
+  font-size:2.65rem;font-weight:950;line-height:1;text-align:center;color:#fff;
+  text-shadow:0 8px 18px rgba(0,0,0,.28)
+}
+.isotope-tile .iso-name{text-align:center;font-weight:850;color:#d6f2ff}
+.isotope-tile .iso-label{
+  text-align:center;font-size:.72rem;letter-spacing:.06em;text-transform:uppercase;color:#82bddc
+}
+.isotope-row{
+  display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin:12px 0 16px
+}
+.isotope-explainer{
+  flex:1 1 260px;border-radius:18px;padding:14px 16px;
+  border:1px solid rgba(57,213,255,.10);
+  background:linear-gradient(180deg,rgba(10,31,51,.90),rgba(7,22,36,.92))
+}
+.pattern-isotope{
+  display:flex;align-items:center;gap:9px;min-width:160px
+}
+.pattern-mini-tile{
+  position:relative;width:62px;height:72px;border-radius:10px;padding:6px;
+  border:1px solid rgba(87,202,255,.34);
+  background:linear-gradient(155deg,#0d314d,#081e31);
+  flex:0 0 auto
+}
+.pattern-mini-tile .z{position:absolute;top:5px;left:7px;font-size:.7rem;font-weight:900}
+.pattern-mini-tile .a{position:absolute;top:5px;right:7px;font-size:.7rem;font-weight:900;color:#ffe5a0}
+.pattern-mini-tile .s{display:grid;place-items:center;height:100%;font-size:1.55rem;font-weight:950}
+.pattern-isotope-name{font-weight:750}
+.case-tile-wrap{display:flex;justify-content:center;margin:8px 0 14px}
+@media(max-width:640px){
+  .isotope-row{align-items:stretch}
+  .isotope-tile{margin:auto}
+}
+
 </style>
 </head>
 <body>
+
+<div class="electron-bg" aria-hidden="true">
+  <span class="bg-electron" style="left:5%;bottom:4%;animation-duration:20s;animation-delay:-2s"></span>
+  <span class="bg-electron" style="left:14%;bottom:18%;animation-duration:24s;animation-delay:-9s"></span>
+  <span class="bg-electron" style="left:27%;bottom:8%;animation-duration:18s;animation-delay:-6s"></span>
+  <span class="bg-electron" style="left:38%;bottom:12%;animation-duration:22s;animation-delay:-11s"></span>
+  <span class="bg-electron" style="left:49%;bottom:2%;animation-duration:26s;animation-delay:-4s"></span>
+  <span class="bg-electron" style="left:58%;bottom:16%;animation-duration:19s;animation-delay:-7s"></span>
+  <span class="bg-electron" style="left:66%;bottom:7%;animation-duration:25s;animation-delay:-13s"></span>
+  <span class="bg-electron" style="left:74%;bottom:20%;animation-duration:21s;animation-delay:-5s"></span>
+  <span class="bg-electron" style="left:82%;bottom:10%;animation-duration:23s;animation-delay:-8s"></span>
+  <span class="bg-electron" style="left:91%;bottom:6%;animation-duration:17s;animation-delay:-3s"></span>
+</div>
+
 <header class="topbar hidden" id="topbar">
   <div class="topbar-inner">
-    <div class="brand"><span class="brand-dot"></span> ATOM INVESTIGATION</div>
+    <div class="brand"><span class="brand-dot"></span> ATOM INVESTIGATION <span id="previewBadge" class="chip hidden" style="margin-left:8px">TEACHER PREVIEW MODE</span></div>
     <nav class="navwrap" aria-label="Mission navigation">
       <button class="navbtn" id="navDay2" onclick="go('day2')">DAY 2</button>
       <button class="navbtn locked" id="navDay3" onclick="go('day3')">DAY 3</button>
       <button class="navbtn locked" id="navDay4" onclick="go('day4')">DAY 4</button>
       <button class="navbtn" onclick="go('result')">RESULTS</button>
+      <button class="navbtn hidden" id="previewCardsBtn" onclick="openPreviewCards()">PREVIEW CARDS</button>
+      <button class="navbtn hidden" id="exitPreviewBtn" onclick="exitTeacherPreview()">EXIT PREVIEW</button>
+      <button class="navbtn" id="soundToggle" onclick="toggleSound()">🔊 SOUND ON</button>
       <button class="navbtn" onclick="openReset()">SETTINGS</button>
     </nav>
     <div class="progressline" aria-label="Progress"><div class="progressbar" id="progressBar"></div></div>
@@ -285,6 +948,7 @@ hr{border:none;border-top:1px solid var(--line);margin:26px 0}
       <div class="actions">
         <button class="primary" onclick="beginInvestigation()">BEGIN / RESUME INVESTIGATION</button>
         <button class="ghost" onclick="openPassword()">I HAVE A DAY PASSWORD</button>
+        <button class="ghost" onclick="openTeacherPreview()">TEACHER PREVIEW</button>
         <button class="ghost" onclick="openTeacherAccess()">TEACHER ACCESS</button>
       </div>
       <div class="science-note" style="margin-top:14px"><b>Automatic saving:</b> Your answers and completed activities are saved under your <b>section + name</b> on this device. At the end of each day, you will receive a password for the next day. After Day 4, you will receive a screenshot-ready <b>3-Day Completion Card</b>.</div>
@@ -319,24 +983,36 @@ hr{border:none;border-top:1px solid var(--line);margin:26px 0}
   <div class="mission">
     <div class="section-title"><span class="num">1</span><h3>Conceptual Zoom</h3></div>
     <p class="lead">Scientists use models to represent structures that cannot be shown accurately at their true scale on this screen. Investigate what this simplified model represents.</p>
-    <div class="science-note"><strong>Model note:</strong> This visualization is not to scale. In the modern atomic model, electrons are described as occupying regions of probability called orbitals rather than traveling along fixed circular tracks.</div>
+    <div class="science-note"><strong>Model note:</strong> This visualization is not to scale. It is designed to help you compare where different particles are found. The moving paths are only a visual aid and are not literal particle tracks.</div>
     <div class="instruction-box">
       <b>Your task</b>
       <ol>
         <li>Observe the moving model before clicking anything.</li>
-        <li>Notice where particles <b>A</b>, <b>B</b>, and <b>C</b> are located and how their colors differ.</li>
-        <li>Select <b>Zoom In</b> to inspect the nucleus more closely. You will use these observations in the next activity.</li>
+        <li>First observe the zoomed-out model. Focus on the central region and the particles moving around it.</li>
+        <li>Select <b>Zoom In</b> to inspect the central region more closely. Look for patterns in <b>location, charge symbol, color, and relative position</b>.</li>
+        <li>Do not try to name the particles yet. Record what you notice mentally—you will use the evidence in the next activity.</li>
       </ol>
     </div>
-    <div class="atomic-visual" id="atomicVisual" aria-label="Moving simplified atomic model with particles A, B, and C">
+    <div class="atomic-visual" id="atomicVisual" aria-label="Moving simplified atomic model for observation">
       <div class="atom-cloud"></div>
       <div class="model-nucleus">
-        <span class="model-particle particle-a" title="Particle A">A</span>
-        <span class="model-particle particle-b" title="Particle B">B</span>
+        <div class="nucleus-center-glow" aria-hidden="true"></div>
+        <div class="nucleus-reveal" aria-hidden="true">
+          <span class="model-particle small particle-a" title="Particle with positive charge">+</span>
+          <span class="model-particle small particle-b" title="Particle with no charge">0</span>
+          <span class="model-particle small particle-a" title="Particle with positive charge">+</span>
+          <span class="model-particle small particle-b" title="Particle with no charge">0</span>
+          <span class="model-particle small particle-a" title="Particle with positive charge">+</span>
+          <span class="model-particle small particle-b" title="Particle with no charge">0</span>
+        </div>
       </div>
-      <span class="model-particle particle-c" title="Particle C">C</span>
+      <span class="model-particle electron particle-c" title="Particle with negative charge" style="animation-duration:7.5s">−</span>
+      <span class="model-particle electron particle-c" title="Particle with negative charge" style="animation-duration:8.3s;animation-delay:-2.2s">−</span>
+      <span class="model-particle electron particle-c" title="Particle with negative charge" style="animation-duration:9.1s;animation-delay:-4.4s">−</span>
       <div class="visual-key">
-        <span class="chip">A · blue</span><span class="chip">B · yellow</span><span class="chip">C · pink</span>
+        <span class="chip">Observe: <strong>charge</strong></span>
+        <span class="chip">Observe: <strong>location</strong></span>
+        <span class="chip">Observe: <strong>movement</strong></span>
       </div>
     </div>
     <div class="actions">
@@ -349,25 +1025,50 @@ hr{border:none;border-top:1px solid var(--line);margin:26px 0}
   <div class="mission">
     <div class="section-title"><span class="num">2</span><h3>Particle Detective</h3></div>
     <div class="instruction-box"><b>Your task</b><ol>
-      <li>Read the evidence for A, B, and C.</li>
-      <li>Select a particle name. On desktop you may drag it; on a phone or tablet, tap the name and then tap A, B, or C.</li>
-      <li>Select <b>Check Evidence</b>, read the feedback, and revise any match that does not fit the scientific evidence.</li>
+      <li>Read the evidence in each case file.</li>
+      <li>Select which subatomic particle fits the evidence best.</li>
+      <li>Select <b>Check Evidence</b>, read the scientific feedback, and revise any answer that does not fit the clues.</li>
     </ol></div>
-    <div class="grid3">
-      <div class="card"><h3>Particle A</h3><p><b>Location:</b> nucleus</p><p><b>Charge:</b> +1</p><p><b>Approx. mass:</b> about 1 u</p></div>
-      <div class="card"><h3>Particle B</h3><p><b>Location:</b> nucleus</p><p><b>Charge:</b> 0</p><p><b>Approx. mass:</b> about 1 u</p></div>
-      <div class="card"><h3>Particle C</h3><p><b>Location:</b> electron cloud surrounding the nucleus</p><p><b>Charge:</b> −1</p><p><b>Approx. mass:</b> about 0.00055 u (about 1/1836 of a proton)</p></div>
-    </div>
-    <div class="particle-bank" aria-label="Particle labels">
-      <button class="particle-token" draggable="true" data-particle="Proton">PROTON</button>
-      <button class="particle-token" draggable="true" data-particle="Neutron">NEUTRON</button>
-      <button class="particle-token" draggable="true" data-particle="Electron">ELECTRON</button>
-    </div>
-    <p class="muted">Desktop: drag a label to a target. Touch/keyboard: select a label, then select a target.</p>
-    <div class="grid3">
-      <button class="dropzone" data-target="A">A: <span class="matchvalue">—</span></button>
-      <button class="dropzone" data-target="B">B: <span class="matchvalue">—</span></button>
-      <button class="dropzone" data-target="C">C: <span class="matchvalue">—</span></button>
+    <div class="science-note"><b>Tip:</b> Use three scientific clues together—<b>charge, location, and approximate mass</b>. The correct answer should fit all three clues.</div>
+    <div class="evidence-grid">
+      <div class="evidence-card" data-target="A">
+        <div class="evidence-top"><div class="tag">CASE FILE A</div><div class="charge-badge charge-plus">+1</div></div>
+        <p><b>Location:</b> inside the nucleus</p>
+        <p><b>Approximate mass:</b> about 1 u</p>
+        <p><b>Clue:</b> This particle gives the atom its atomic number.</p>
+        <div class="suspect-grid">
+          <button class="particle-choice" data-target="A" data-particle="Proton">Proton <span class="sub">p⁺ · positive</span></button>
+          <button class="particle-choice" data-target="A" data-particle="Neutron">Neutron <span class="sub">n⁰ · neutral</span></button>
+          <button class="particle-choice" data-target="A" data-particle="Electron">Electron <span class="sub">e⁻ · negative</span></button>
+        </div>
+        <div class="selection-line">Selected answer: <b id="matchA">—</b></div>
+      </div>
+
+      <div class="evidence-card" data-target="B">
+        <div class="evidence-top"><div class="tag">CASE FILE B</div><div class="charge-badge charge-zero">0</div></div>
+        <p><b>Location:</b> inside the nucleus</p>
+        <p><b>Approximate mass:</b> about 1 u</p>
+        <p><b>Clue:</b> This particle affects mass number but does not change the element.</p>
+        <div class="suspect-grid">
+          <button class="particle-choice" data-target="B" data-particle="Proton">Proton <span class="sub">p⁺ · positive</span></button>
+          <button class="particle-choice" data-target="B" data-particle="Neutron">Neutron <span class="sub">n⁰ · neutral</span></button>
+          <button class="particle-choice" data-target="B" data-particle="Electron">Electron <span class="sub">e⁻ · negative</span></button>
+        </div>
+        <div class="selection-line">Selected answer: <b id="matchB">—</b></div>
+      </div>
+
+      <div class="evidence-card" data-target="C">
+        <div class="evidence-top"><div class="tag">CASE FILE C</div><div class="charge-badge charge-minus">−1</div></div>
+        <p><b>Location:</b> in the electron cloud surrounding the nucleus</p>
+        <p><b>Approximate mass:</b> about 0.00055 u (about 1/1836 of a proton)</p>
+        <p><b>Clue:</b> In a neutral atom, the number of these particles equals the number of protons.</p>
+        <div class="suspect-grid">
+          <button class="particle-choice" data-target="C" data-particle="Proton">Proton <span class="sub">p⁺ · positive</span></button>
+          <button class="particle-choice" data-target="C" data-particle="Neutron">Neutron <span class="sub">n⁰ · neutral</span></button>
+          <button class="particle-choice" data-target="C" data-particle="Electron">Electron <span class="sub">e⁻ · negative</span></button>
+        </div>
+        <div class="selection-line">Selected answer: <b id="matchC">—</b></div>
+      </div>
     </div>
     <div class="actions"><button class="primary" onclick="checkParticles()">CHECK EVIDENCE</button><button class="ghost" onclick="resetParticleMatch()">RESET</button></div>
     <div id="particleFeedback" class="hidden"></div>
@@ -375,6 +1076,20 @@ hr{border:none;border-top:1px solid var(--line);margin:26px 0}
 
   <div class="mission">
     <div class="section-title"><span class="num">3</span><h3>Case File: Neutral Aluminum-27</h3></div>
+    <div class="isotope-row">
+      <div class="isotope-tile" aria-label="Aluminum-27 isotope tile">
+      <div class="iso-z">13</div>
+      <div class="iso-a">27</div>
+      <div class="iso-symbol">Al</div>
+      <div class="iso-name">Aluminum</div>
+      <div class="iso-label">isotope tile</div>
+    </div>
+      <div class="isotope-explainer">
+        <b>Read the isotope tile.</b>
+        <p>The atomic number is <b>13</b>, so aluminum has 13 protons. The number <b>27</b> is the mass number for this specific isotope, aluminum-27.</p>
+        <p class="muted">This tile is styled like a periodic-table entry, but the top-right value is the isotope's mass number—not aluminum's decimal average atomic mass on a standard periodic table.</p>
+      </div>
+    </div>
     <div class="grid3">
       <div class="card center"><h3>13</h3><p>positively charged particles</p></div>
       <div class="card center"><h3>14</h3><p>neutral particles</p></div>
@@ -466,8 +1181,20 @@ hr{border:none;border-top:1px solid var(--line);margin:26px 0}
 
   <div class="mission">
     <div class="section-title"><span class="num">1</span><h3>Build Neutral Aluminum-27</h3></div>
-    <div class="instruction-box"><b>Your task:</b> Use the three toolbox buttons to place particles into the model. Protons and neutrons belong in the nucleus; electrons belong in the electron cloud. Use the given atomic number, mass number, and neutral charge as clues. You may remove the last particle or reset this activity without affecting the other Day 3 activities.</div>
-    <div class="statrow"><span class="stat">Atomic Number: <b>13</b></span><span class="stat">Mass Number: <b>27</b></span><span class="stat">Charge state: <b>neutral</b></span></div>
+    <div class="instruction-box"><b>Your task:</b> Use the three toolbox buttons to place particles into the model. Protons and neutrons belong in the nucleus; electrons belong in the electron cloud. Use the isotope tile and the neutral charge as clues. You may remove the last particle or reset this activity without affecting the other Day 3 activities.</div>
+    <div class="isotope-row">
+      <div class="isotope-tile" aria-label="Aluminum-27 isotope tile">
+      <div class="iso-z">13</div>
+      <div class="iso-a">27</div>
+      <div class="iso-symbol">Al</div>
+      <div class="iso-name">Aluminum</div>
+      <div class="iso-label">isotope tile</div>
+    </div>
+      <div class="isotope-explainer">
+        <b>Build this neutral isotope.</b>
+        <div class="statrow"><span class="stat">Atomic Number: <b>13</b></span><span class="stat">Mass Number: <b>27</b></span><span class="stat">Charge state: <b>neutral</b></span></div>
+      </div>
+    </div>
     <div class="science-note">The mass number 27 identifies this particular isotope. It is not the decimal average atomic mass shown for aluminum on a periodic table.</div>
     <div class="builder">
       <div class="atom-stage">
@@ -498,6 +1225,7 @@ hr{border:none;border-top:1px solid var(--line);margin:26px 0}
     <div class="section-title"><span class="num">2</span><h3>Pattern Hunt</h3></div>
     <div class="instruction-box"><b>Your task:</b> Each row represents a neutral isotope. Use the atomic number and mass number to calculate the missing proton, neutron, and electron counts. Complete all five rows, then select <b>Check Table</b>.</div>
     <p>Assume each example represents a <b>neutral atom</b>.</p>
+    <div class="science-note"><b>Reading the isotope tiles:</b> the top-left number is the atomic number and the top-right number is the mass number of the specific isotope used in this activity. Standard periodic tables usually show average atomic mass instead of isotope mass number.</div>
     <div class="tablewrap"><table>
       <thead><tr><th>Isotope</th><th>Atomic #</th><th>Mass #</th><th>Protons</th><th>Neutrons</th><th>Electrons</th></tr></thead>
       <tbody id="patternBody"></tbody>
@@ -518,9 +1246,27 @@ hr{border:none;border-top:1px solid var(--line);margin:26px 0}
   <div class="mission">
     <div class="section-title"><span class="num">4</span><h3>Atomic Codebreaker</h3></div>
     <div class="grid3">
-      <div class="card"><h3>Case A · Chlorine-35</h3><p>Atomic # 17 · Mass # 35 · neutral</p><label>Protons</label><input type="number" id="aP"><label>Neutrons</label><input type="number" id="aN"><label>Electrons</label><input type="number" id="aE"><button class="smallbtn" style="margin-top:8px" onclick="checkCode('A',[17,18,17])">CHECK</button><div id="codeAfb"></div></div>
-      <div class="card"><h3>Case B · Fluorine-19</h3><p>Atomic # 9 · Mass # 19 · neutral</p><label>Protons</label><input type="number" id="bP"><label>Neutrons</label><input type="number" id="bN"><label>Electrons</label><input type="number" id="bE"><button class="smallbtn" style="margin-top:8px" onclick="checkCode('B',[9,10,9])">CHECK</button><div id="codeBfb"></div></div>
-      <div class="card"><h3>Case C · Phosphorus-31</h3><p>Given: 15 protons, 16 neutrons, 15 electrons</p><label>Atomic Number</label><input type="number" id="cZ"><label>Mass Number</label><input type="number" id="cA"><button class="smallbtn" style="margin-top:8px" onclick="checkCodeC()">CHECK</button><div id="codeCfb"></div></div>
+      <div class="card"><h3>Case A · Chlorine-35</h3><div class="case-tile-wrap"><div class="isotope-tile" aria-label="Chlorine-35 isotope tile">
+      <div class="iso-z">17</div>
+      <div class="iso-a">35</div>
+      <div class="iso-symbol">Cl</div>
+      <div class="iso-name">Chlorine</div>
+      <div class="iso-label">isotope tile</div>
+    </div></div><p class="muted center">Neutral isotope</p><label>Protons</label><input type="number" id="aP"><label>Neutrons</label><input type="number" id="aN"><label>Electrons</label><input type="number" id="aE"><button class="smallbtn" style="margin-top:8px" onclick="checkCode('A',[17,18,17])">CHECK</button><div id="codeAfb"></div></div>
+      <div class="card"><h3>Case B · Fluorine-19</h3><div class="case-tile-wrap"><div class="isotope-tile" aria-label="Fluorine-19 isotope tile">
+      <div class="iso-z">9</div>
+      <div class="iso-a">19</div>
+      <div class="iso-symbol">F</div>
+      <div class="iso-name">Fluorine</div>
+      <div class="iso-label">isotope tile</div>
+    </div></div><p class="muted center">Neutral isotope</p><label>Protons</label><input type="number" id="bP"><label>Neutrons</label><input type="number" id="bN"><label>Electrons</label><input type="number" id="bE"><button class="smallbtn" style="margin-top:8px" onclick="checkCode('B',[9,10,9])">CHECK</button><div id="codeBfb"></div></div>
+      <div class="card"><h3>Case C · Phosphorus-31</h3><div class="case-tile-wrap"><div class="isotope-tile" aria-label="Phosphorus-31 isotope tile">
+      <div class="iso-z">15</div>
+      <div class="iso-a">31</div>
+      <div class="iso-symbol">P</div>
+      <div class="iso-name">Phosphorus</div>
+      <div class="iso-label">isotope tile</div>
+    </div></div><p>Given: 15 protons, 16 neutrons, and 15 electrons.</p><label>Atomic Number</label><input type="number" id="cZ"><label>Mass Number</label><input type="number" id="cA"><button class="smallbtn" style="margin-top:8px" onclick="checkCodeC()">CHECK</button><div id="codeCfb"></div></div>
     </div>
     <div id="day3Continue" class="actions hidden"><button class="primary" onclick="completeDay3()">FINISH DAY 3 &amp; VIEW COMPLETION CARD</button></div>
   </div>
@@ -617,6 +1363,16 @@ hr{border:none;border-top:1px solid var(--line);margin:26px 0}
   </div>
   <div class="mission">
     <div class="section-title"><span class="num">4</span><h3>Worked Example · Neutral Aluminum-27</h3></div>
+    <div class="isotope-row">
+      <div class="isotope-tile" aria-label="Aluminum-27 isotope tile">
+      <div class="iso-z">13</div>
+      <div class="iso-a">27</div>
+      <div class="iso-symbol">Al</div>
+      <div class="iso-name">Aluminum</div>
+      <div class="iso-label">isotope tile</div>
+    </div>
+      <div class="isotope-explainer"><b>Use the isotope tile as your starting information.</b><p>Atomic number identifies the proton count. Mass number counts protons plus neutrons. Because the example is neutral, the electron count equals the proton count.</p></div>
+    </div>
     <div class="grid2">
       <div class="card"><p><b>Atomic number:</b> 13</p><p><b>Mass number:</b> 27</p><p>Protons = 13</p><p>Electrons = 13 because the atom is neutral.</p><p>Neutrons = 27 − 13 = 14</p></div>
       <div class="card"><h3>Final composition</h3><p>13 protons</p><p>14 neutrons</p><p>13 electrons</p><p class="muted">The 27 is the mass number of this isotope, not aluminum’s decimal average atomic mass.</p></div>
@@ -627,14 +1383,33 @@ hr{border:none;border-top:1px solid var(--line);margin:26px 0}
   <div class="mission">
     <div class="section-title"><span class="num">5</span><h3>Atomic Error Detector</h3></div>
     <div class="grid3">
-      <div class="card"><h3>Aluminum-27</h3><p>Atomic # 13 · Mass # 27 · neutral</p><p>Student: 13 p, 13 n, 13 e</p><label>Correct neutron count</label><input type="number" id="err1"><button class="smallbtn" style="margin-top:8px" onclick="checkNumeric('err1',14,'err1fb','err1')">CHECK</button><div id="err1fb"></div></div>
-      <div class="card"><h3>Oxygen-16</h3><p>Atomic # 8 · Mass # 16 · neutral</p><p>Student: 8 p, 8 n, 7 e</p><label>Correct electron count</label><input type="number" id="err2"><button class="smallbtn" style="margin-top:8px" onclick="checkNumeric('err2',8,'err2fb','err2')">CHECK</button><div id="err2fb"></div></div>
-      <div class="card"><h3>Sodium-23</h3><p>Atomic # 11 · Mass # 23 · neutral</p><p>Student: 11 p, 13 n, 11 e</p><label>Correct neutron count</label><input type="number" id="err3"><button class="smallbtn" style="margin-top:8px" onclick="checkNumeric('err3',12,'err3fb','err3')">CHECK</button><div id="err3fb"></div></div>
+      <div class="card"><h3>Aluminum-27</h3><div class="case-tile-wrap"><div class="isotope-tile" aria-label="Aluminum-27 isotope tile">
+      <div class="iso-z">13</div>
+      <div class="iso-a">27</div>
+      <div class="iso-symbol">Al</div>
+      <div class="iso-name">Aluminum</div>
+      <div class="iso-label">isotope tile</div>
+    </div></div><p class="muted center">Neutral isotope</p><p>Student: 13 p, 13 n, 13 e</p><label>Correct neutron count</label><input type="number" id="err1"><button class="smallbtn" style="margin-top:8px" onclick="checkNumeric('err1',14,'err1fb','err1')">CHECK</button><div id="err1fb"></div></div>
+      <div class="card"><h3>Oxygen-16</h3><div class="case-tile-wrap"><div class="isotope-tile" aria-label="Oxygen-16 isotope tile">
+      <div class="iso-z">8</div>
+      <div class="iso-a">16</div>
+      <div class="iso-symbol">O</div>
+      <div class="iso-name">Oxygen</div>
+      <div class="iso-label">isotope tile</div>
+    </div></div><p class="muted center">Neutral isotope</p><p>Student: 8 p, 8 n, 7 e</p><label>Correct electron count</label><input type="number" id="err2"><button class="smallbtn" style="margin-top:8px" onclick="checkNumeric('err2',8,'err2fb','err2')">CHECK</button><div id="err2fb"></div></div>
+      <div class="card"><h3>Sodium-23</h3><div class="case-tile-wrap"><div class="isotope-tile" aria-label="Sodium-23 isotope tile">
+      <div class="iso-z">11</div>
+      <div class="iso-a">23</div>
+      <div class="iso-symbol">Na</div>
+      <div class="iso-name">Sodium</div>
+      <div class="iso-label">isotope tile</div>
+    </div></div><p class="muted center">Neutral isotope</p><p>Student: 11 p, 13 n, 11 e</p><label>Correct neutron count</label><input type="number" id="err3"><button class="smallbtn" style="margin-top:8px" onclick="checkNumeric('err3',12,'err3fb','err3')">CHECK</button><div id="err3fb"></div></div>
     </div>
   </div>
 
   <div class="mission">
     <div class="section-title"><span class="num">6</span><h3>Create an Atom ID</h3></div>
+    <div class="instruction-box"><b>Your task:</b> Choose a neutral isotope. Use only the atomic number, mass number, and neutral charge shown in the isotope tile to determine the numbers of protons, neutrons, and electrons. The tile will not provide those particle counts for you.</div>
     <label for="isotopeSelect">Choose a neutral isotope</label>
     <select id="isotopeSelect" onchange="loadAtomId()">
       <option value="">Select...</option>
@@ -654,7 +1429,7 @@ hr{border:none;border-top:1px solid var(--line);margin:26px 0}
     <label for="reflection">How do atomic number, mass number, and the numbers of protons, neutrons, and electrons help you describe a specific atom?</label>
     <textarea id="reflection" placeholder="Write 2–3 complete sentences."></textarea>
     <div class="actions"><button class="primary" onclick="saveReflection()">SAVE REFLECTION</button></div><div id="reflectionFb"></div>
-    <div id="completeMissionBtn" class="actions hidden"><button class="primary" onclick="completeDay4()">FINISH DAY 4 &amp; VIEW TEACHER COMPLETION CARD</button></div>
+    <div id="completeMissionBtn" class="actions hidden"><button class="primary" onclick="completeDay4()">FINISH DAY 4 &amp; VIEW COMPLETION CARD</button></div>
   </div>
 </section>
 
@@ -688,17 +1463,48 @@ hr{border:none;border-top:1px solid var(--line);margin:26px 0}
 <div id="completionModal" class="modal completion-modal hidden" role="dialog" aria-modal="true" aria-labelledby="completionTitle">
   <div class="modal-box">
     <div class="completion-card" id="completionCard">
-      <div class="kicker">ATOM INVESTIGATION · COMPLETION RECORD</div>
-      <h2 id="completionTitle">Day Complete</h2>
-      <div class="grid2">
-        <div class="card"><b>Student</b><div id="completionStudent" class="subtitle"></div></div>
-        <div class="card"><b>Completed</b><div id="completionWhen"></div></div>
-        <div class="card"><b>First-attempt mastery</b><div id="completionMastery" class="subtitle"></div><div class="mastery-meter"><span id="completionMeter"></span></div><div id="completionLevel"></div></div>
-        <div class="card"><b id="completionCodeLabel">Next-day password</b><div id="completionPassword" class="subtitle"></div></div>
-        <div class="card"><b>Google Sheet Submission</b><div id="completionRemoteStatus">Not sent yet</div><button class="smallbtn no-print" id="completionRetryBtn" style="margin-top:8px" onclick="retryRemoteSubmission()">RETRY SUBMISSION</button></div>
+      <div class="certificate-ribbon">ACHIEVED</div>
+      <div class="completion-shell">
+        <div class="completion-topbar">
+          <div class="completion-badge">⚛ Atom Investigation</div>
+          <div class="completion-status">✓ Day Completed</div>
+        </div>
+
+        <div class="completion-hero">
+          <div class="hero-icon" aria-hidden="true">✨ ⚛ ✨</div>
+          <h2 id="completionTitle">Day Complete</h2>
+          <p class="hero-sub">Excellent work. This record shows that the student finished the required asynchronous activities for this day.</p>
+          <div id="completionStudent" class="completion-student-name"></div>
+          <div id="completionSectionWrapper" class="completion-section-chip">Section: <span id="completionSection">—</span></div>
+        </div>
+
+        <div class="completion-grid">
+          <div class="completion-metric">
+            <div class="metric-label">Completed</div>
+            <div id="completionWhen" class="metric-value"></div>
+          </div>
+          <div class="completion-metric">
+            <div class="metric-label">Next-Day Password</div>
+            <div id="completionPassword" class="metric-value"></div>
+          </div>
+          <div class="completion-metric">
+            <div class="metric-label">First-Attempt Mastery</div>
+            <div id="completionMastery" class="metric-value"></div>
+            <div class="mastery-meter"><span id="completionMeter"></span></div>
+            <div id="completionLevel" class="mastery-pill"></div>
+          </div>
+          <div class="completion-metric">
+            <div class="metric-label">Google Sheet Submission</div>
+            <div id="completionRemoteStatus" class="metric-value">Not sent yet</div>
+            <button class="smallbtn no-print" id="completionRetryBtn" style="margin-top:10px" onclick="retryRemoteSubmission()">SEND / RESEND TO GOOGLE SHEET</button>
+          </div>
+        </div>
+
+        <div class="completion-footer-note">
+          <div class="password-box"><b>Note:</b> Take a screenshot of this card to submit your proof of completion to your teacher. This card shows the student name, section, completion date and time, mastery result, and the password needed for the next day.</div>
+        </div>
       </div>
-      <div class="password-box" style="margin-top:16px"><b>Teacher proof:</b> Take a screenshot of this entire card. It records the student name, completion date and time, mastery level, and next-day password or final submission code.</div>
-    </div>
+</div>
     <div class="actions">
       <button class="ghost" onclick="closeCompletion()">CLOSE</button>
       <button class="primary" onclick="window.print()">PRINT / SAVE RESULTS</button>
@@ -726,39 +1532,69 @@ hr{border:none;border-top:1px solid var(--line);margin:26px 0}
 <div id="finalCompletionModal" class="modal completion-modal hidden" role="dialog" aria-modal="true" aria-labelledby="finalCompletionTitle">
   <div class="modal-box">
     <div class="completion-card" id="finalCompletionCard">
-      <div class="kicker">ATOM INVESTIGATION · OFFICIAL COMPLETION RECORD</div>
-      <h2 id="finalCompletionTitle">3-DAY ASYNCHRONOUS ACTIVITY COMPLETE</h2>
-      <p class="lead" style="margin-top:0">Congratulations! You have completed all the asynchronous activities in <b>Atom Investigation: From Atomic Models to Atomic Particles</b>.</p>
+      <div class="certificate-ribbon">COMPLETED</div>
+      <div class="completion-shell">
+        <div class="completion-topbar">
+          <div class="completion-badge">🏆 Science 8 Achievement Record</div>
+          <div class="completion-status">✓ All 3 Days Finished</div>
+        </div>
 
-      <div class="grid2">
-        <div class="card"><b>Student</b><div id="finalStudent" class="subtitle"></div></div>
-        <div class="card"><b>Section</b><div id="finalSection" class="subtitle"></div></div>
-        <div class="card"><b>All Activities Completed</b><div id="finalWhen"></div></div>
-        <div class="card"><b>Overall First-Attempt Mastery</b><div id="finalMastery" class="subtitle"></div><div id="finalMasteryLevel"></div></div>
-      </div>
+        <div class="completion-hero">
+          <div class="hero-icon" aria-hidden="true">🏆 ✦ ⚛ ✦ 🎉</div>
+          <h2 id="finalCompletionTitle">3-DAY ASYNCHRONOUS ACTIVITY COMPLETE</h2>
+          <p class="hero-sub">Congratulations! This certificate confirms that the student successfully completed all asynchronous activities in <b>Atom Investigation: From Atomic Models to Atomic Particles</b>.</p>
+          <div id="finalStudent" class="completion-student-name"></div>
+          <div class="completion-section-chip">Section: <span id="finalSection">—</span></div>
+        </div>
 
-      <h3 style="margin-top:20px">Three-Day Record</h3>
-      <div class="grid3">
-        <div class="card"><b>Day 2 · Engage</b><div id="finalDay2"></div></div>
-        <div class="card"><b>Day 3 · Explore</b><div id="finalDay3"></div></div>
-        <div class="card"><b>Day 4 · Explain</b><div id="finalDay4"></div></div>
-      </div>
+        <div class="completion-grid">
+          <div class="completion-metric">
+            <div class="metric-label">All Activities Completed</div>
+            <div id="finalWhen" class="metric-value"></div>
+          </div>
+          <div class="completion-metric">
+            <div class="metric-label">Final Submission Code</div>
+            <div id="finalSubmissionCode" class="metric-value" style="font-size:1.45rem"></div>
+          </div>
+          <div class="completion-metric">
+            <div class="metric-label">Overall First-Attempt Mastery</div>
+            <div id="finalMastery" class="metric-value"></div>
+            <div class="mastery-meter"><span id="finalMeter"></span></div>
+            <div id="finalMasteryLevel" class="mastery-pill"></div>
+          </div>
+          <div class="completion-metric">
+            <div class="metric-label">Google Sheet Submission</div>
+            <div id="finalRemoteStatus" class="metric-value">Not sent yet</div>
+            <button class="smallbtn no-print" style="margin-top:10px" onclick="retryRemoteSubmission(4)">SEND / RESEND FINAL RECORD</button>
+          </div>
+        </div>
 
-      <div class="password-box" style="margin-top:16px">
-        <b>Final Submission Code</b>
-        <div id="finalSubmissionCode" class="subtitle" style="font-size:1.45rem;margin-top:4px"></div>
-      </div>
+        <div class="completion-days">
+          <h3>Three-Day Completion Record</h3>
+          <div class="day-timeline">
+            <div class="day-step">
+              <div class="step-kicker">Day 2</div>
+              <div class="step-title">Engage</div>
+              <div id="finalDay2" class="step-time"></div>
+            </div>
+            <div class="day-step">
+              <div class="step-kicker">Day 3</div>
+              <div class="step-title">Explore</div>
+              <div id="finalDay3" class="step-time"></div>
+            </div>
+            <div class="day-step">
+              <div class="step-kicker">Day 4</div>
+              <div class="step-title">Explain</div>
+              <div id="finalDay4" class="step-time"></div>
+            </div>
+          </div>
+        </div>
 
-      <div class="card" style="margin-top:14px">
-        <b>Google Sheet Submission</b>
-        <div id="finalRemoteStatus">Not sent yet</div>
-        <button class="smallbtn no-print" style="margin-top:8px" onclick="retryRemoteSubmission(4)">RETRY FINAL SUBMISSION</button>
+        <div class="completion-footer-note">
+          <div class="science-note"><b>Note:</b> Take a screenshot of this card to submit your proof of completion to your teacher. It includes the student name, section, completion date and time, mastery level, three-day completion record, and final submission code.</div>
+        </div>
       </div>
-
-      <div class="science-note" style="margin-top:14px">
-        <b>Show your teacher:</b> Take a screenshot of this entire card. It includes your name, section, completion date and time, mastery level, three-day record, and final submission code. The teacher's class dashboard is maintained separately and cannot be opened from the student website.
-      </div>
-    </div>
+</div>
     <div class="actions">
       <button class="ghost" onclick="closeFinalCompletion()">CLOSE</button>
       <button class="primary" onclick="window.print()">PRINT / SAVE</button>
@@ -766,6 +1602,40 @@ hr{border:none;border-top:1px solid var(--line);margin:26px 0}
   </div>
 </div>
 
+
+
+<div id="teacherPreviewModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="teacherPreviewTitle">
+  <div class="modal-box teacher-lock">
+    <div class="kicker">TEACHER CONTENT CHECK</div>
+    <h3 id="teacherPreviewTitle">Teacher Preview</h3>
+    <p class="muted">Enter the Teacher Preview password to unlock Day 2, Day 3, and Day 4 for content checking. Preview mode does not submit records to Google Sheets and does not overwrite student progress.</p>
+    <label for="teacherPreviewPasswordInput">Preview password</label>
+    <input id="teacherPreviewPasswordInput" type="password" autocomplete="off" placeholder="Teacher preview password">
+    <div id="teacherPreviewFeedback"></div>
+    <div class="actions">
+      <button class="ghost" onclick="closeTeacherPreview()">CANCEL</button>
+      <button class="primary" onclick="verifyTeacherPreview()">ENTER PREVIEW MODE</button>
+    </div>
+  </div>
+</div>
+
+
+<div id="previewCardsModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="previewCardsTitle">
+  <div class="modal-box teacher-lock">
+    <div class="kicker">TEACHER PREVIEW MODE</div>
+    <h3 id="previewCardsTitle">Preview Completion Cards</h3>
+    <p class="muted">Open the Day 2, Day 3, Day 4, or final completion card without completing the activities. These preview cards use sample mastery data and are not saved or submitted.</p>
+    <div class="actions" style="margin-top:16px">
+      <button class="ghost" onclick="previewCompletionCard(2)">DAY 2 CARD</button>
+      <button class="ghost" onclick="previewCompletionCard(3)">DAY 3 CARD</button>
+      <button class="ghost" onclick="previewCompletionCard(4)">DAY 4 CARD</button>
+      <button class="primary" onclick="previewFinalCard()">FINAL 3-DAY CARD</button>
+    </div>
+    <div class="actions">
+      <button class="ghost" onclick="closePreviewCards()">CLOSE</button>
+    </div>
+  </div>
+</div>
 
 <div id="teacherAccessModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="teacherAccessTitle">
   <div class="modal-box teacher-lock">
@@ -839,7 +1709,9 @@ const STORAGE_KEY='atomInvestigationStateV4';
 const PROFILE_STORE_KEY='atomInvestigationProfilesV4';
 const ACTIVE_PROFILE_KEY='atomInvestigationActiveProfileV4';
 const TEACHER_PASSWORD_SHA256='226b7c586aa685f8e6af0ce85ad7f67e90c4e6f43fddd29c8b2202af89ff77e7';
+const TEACHER_PREVIEW_SHA256='ee6a544ed8d5089e9e045420fc303e1c662f1728d3c62dca7249de70bb3cc137';
 const GOOGLE_SHEET_WEB_APP='https://script.google.com/macros/s/AKfycbxr-yAlnsvAcZnEGC0Q3qACQXtaqTq655QKZwK_NWFxqM62fF3tHPxZH9zwdobmM9RKEw/exec';
+const REMOTE_SUBMISSION_VERSION='2026-10-06-fixed-sheet-v2';
 
 const DAY_ITEMS={
   2:['d2particles','d2q1','d2q2','d2q3','d2q4','d2exit'],
@@ -869,6 +1741,97 @@ let builder=state.builder;
 let match=state.match;
 let activePasswordTarget=3;
 let revealedCodes=0;
+let previewMode=false;
+let pendingFinalAfterDay4=false;
+let activeCompletionDay=null;
+let soundEnabled=localStorage.getItem('atomSoundEnabled')!=='off';
+let audioCtx=null;
+function ensureAudio(){
+  if(!soundEnabled)return null;
+  const Ctx=window.AudioContext||window.webkitAudioContext;
+  if(!Ctx)return null;
+  if(!audioCtx)audioCtx=new Ctx();
+  if(audioCtx.state==='suspended')audioCtx.resume();
+  return audioCtx;
+}
+function playTone(freq=.0,dur=.08,type='sine',gain=.04){
+  const ctx=ensureAudio();
+  if(!ctx)return;
+  const osc=ctx.createOscillator(),g=ctx.createGain();
+  osc.type=type;osc.frequency.value=freq;g.gain.value=gain;
+  osc.connect(g);g.connect(ctx.destination);
+  const now=ctx.currentTime;
+  g.gain.setValueAtTime(gain,now);
+  g.gain.exponentialRampToValueAtTime(0.0001,now+dur);
+  osc.start(now);osc.stop(now+dur);
+}
+function playCorrectSound(){playTone(740,.06,'triangle',.045);setTimeout(()=>playTone(988,.1,'triangle',.04),55)}
+function playWrongSound(){playTone(220,.07,'sawtooth',.035);setTimeout(()=>playTone(174,.11,'sawtooth',.03),55)}
+function playActionSound(){playTone(520,.045,'sine',.028)}
+function playCelebrateSound(){
+  playTone(523,.08,'triangle',.045);
+  setTimeout(()=>playTone(659,.08,'triangle',.04),70);
+  setTimeout(()=>playTone(784,.14,'triangle',.04),140);
+}
+function updateSoundToggle(){
+  const btn=document.getElementById('soundToggle');
+  if(btn)btn.textContent=soundEnabled?'🔊 SOUND ON':'🔇 SOUND OFF';
+}
+function toggleSound(){
+  soundEnabled=!soundEnabled;
+  localStorage.setItem('atomSoundEnabled',soundEnabled?'on':'off');
+  updateSoundToggle();
+  if(soundEnabled)playActionSound();
+}
+function periodicTileHTML(o){
+  if(!o)return '';
+  return `<div class="pt-wrap">
+    <div class="pt-tile">
+      <div class="pt-atomic">${o.z}</div>
+      <div class="pt-mass">${o.a}</div>
+      <div class="pt-symbol">${o.symbol}</div>
+      <div class="pt-name">${o.name}</div>
+      <div class="pt-class">Neutral isotope</div>
+    </div>
+    <div class="pt-facts">
+      <h3 style="margin:0">${o.name}-${o.a}</h3>
+      <div class="muted">Use the periodic-table tile to read the atomic number and identify the element. The mass number belongs to this specific isotope.</div>
+      <div class="facts-grid">
+        <div class="pt-fact"><b>Atomic number</b>${o.z}</div>
+        <div class="pt-fact"><b>Mass number</b>${o.a}</div>
+        <div class="pt-fact"><b>Protons</b>${o.p}</div>
+        <div class="pt-fact"><b>Neutrons</b>${o.n}</div>
+        <div class="pt-fact"><b>Electrons</b>${o.e}</div>
+        <div class="pt-fact"><b>Symbol</b>${o.symbol}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+function atomIdPromptTileHTML(o){
+  if(!o)return '';
+  return `<div class="pt-wrap">
+    <div class="pt-tile">
+      <div class="pt-atomic">${o.z}</div>
+      <div class="pt-mass">${o.a}</div>
+      <div class="pt-symbol">${o.symbol}</div>
+      <div class="pt-name">${o.name}</div>
+      <div class="pt-class">Neutral isotope</div>
+    </div>
+    <div class="pt-facts">
+      <h3 style="margin:0">${o.name}-${o.a}</h3>
+      <div class="muted">Use the atomic number, mass number, and neutral charge to determine the particle counts yourself.</div>
+      <div class="facts-grid">
+        <div class="pt-fact"><b>Atomic number</b>${o.z}</div>
+        <div class="pt-fact"><b>Mass number</b>${o.a}</div>
+        <div class="pt-fact"><b>Symbol</b>${o.symbol}</div>
+        <div class="pt-fact"><b>Charge state</b>Neutral</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+
 
 const mcqFeedback={
   d2q1:{
@@ -913,6 +1876,7 @@ function readProfiles(){
 }
 function writeProfiles(profiles){localStorage.setItem(PROFILE_STORE_KEY,JSON.stringify(profiles))}
 function save(){
+  if(previewMode){updateUI();return;}
   state.builder=builder;state.match=match;
   localStorage.setItem(STORAGE_KEY,JSON.stringify(state));
 
@@ -944,6 +1908,7 @@ function load(){
   document.getElementById('studentName').value=state.studentName||'';
   document.getElementById('studentSection').value=state.section||'';
   if(state.studentName)document.getElementById('topbar').classList.remove('hidden');
+  updateSoundToggle();
 }
 function escapeHtml(str){
   return String(str).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
@@ -975,12 +1940,6 @@ function restoreMcq(){
     const btn=buttons.find(b=>b.textContent.trim()===rec.text);
     if(btn)btn.style.outline='2px solid '+(rec.ok?'var(--green)':'var(--orange)');
     renderMcqFeedback(group,id,rec.ok);
-  });
-}
-function restoreMatch(){
-  document.querySelectorAll('.dropzone').forEach(z=>{
-    const val=match[z.dataset.target];
-    if(val){z.querySelector('.matchvalue').textContent=val;z.classList.add('filled')}
   });
 }
 function restoreCodes(){
@@ -1024,6 +1983,21 @@ function updateUI(){
 }
 function setText(id,text){const el=document.getElementById(id);if(el)el.textContent=text}
 
+
+function syncPreviouslyCompletedDays(){
+  const completed=[];
+  if(state.day2Completed)completed.push(2);
+  if(state.day3Completed)completed.push(3);
+  if(state.day4Completed)completed.push(4);
+
+  completed.forEach(day=>{
+    const r=state.remoteSubmissions?.[day];
+    if(!r || r.version!==REMOTE_SUBMISSION_VERSION){
+      submitToGoogleSheet(day,{force:true});
+    }
+  });
+}
+
 function beginInvestigation(){
   const name=document.getElementById('studentName').value.trim();
   const section=document.getElementById('studentSection').value.trim();
@@ -1056,8 +2030,10 @@ function beginInvestigation(){
   state.studentName=name;state.section=section;
   localStorage.setItem(ACTIVE_PROFILE_KEY,key);
   document.getElementById('topbar').classList.remove('hidden');
+  updateSoundToggle();
   save();
   restoreInputs();restoreMcq();restoreMatch();renderBuilder();
+  setTimeout(syncPreviouslyCompletedDays,300);
 
   if(state.day4Completed)go('result');
   else if(state.day4Access)go('day4');
@@ -1065,8 +2041,8 @@ function beginInvestigation(){
   else go('day2');
 }
 function go(dest){
-  if(dest==='day3'&&!state.day3Access){openPassword(3);return}
-  if(dest==='day4'&&!state.day4Access){openPassword(4);return}
+  if(dest==='day3'&&!state.day3Access&&!previewMode){openPassword(3);return}
+  if(dest==='day4'&&!state.day4Access&&!previewMode){openPassword(4);return}
   ['home','day2','day3','day4','result'].forEach(x=>document.getElementById(x+'Screen').classList.add('hidden'));
   document.getElementById(dest+'Screen').classList.remove('hidden');
   document.querySelectorAll('.navbtn').forEach(b=>b.classList.remove('current'));
@@ -1081,6 +2057,7 @@ function showFb(id,positive,msg){
   if(!el)return;
   el.className='feedback '+(positive?'good':'bad');
   el.innerHTML=`${positive?'🧠':'🔎'} <b>Feedback:</b> ${msg}`;
+  positive?playCorrectSound():playWrongSound();
 }
 function markActivity(id){state.activities[id]=true;save()}
 function recordAttempt(id,ok){
@@ -1096,8 +2073,9 @@ function gradeAttempt(id,ok){
 
 function zoomAtom(){
   document.getElementById('atomicVisual').classList.toggle('zoomed');
+  playActionSound();
   document.getElementById('zoomReveal').classList.remove('hidden');
-  document.getElementById('zoomReveal').innerHTML='<b>Feedback:</b> A and B remain inside the nucleus, while C moves through the surrounding electron-cloud region. The motion is an educational animation and does not represent a literal electron path.';
+  document.getElementById('zoomReveal').innerHTML='<b>Observation checkpoint:</b> The model shows two kinds of particles inside the central region and another kind moving in the surrounding region. Notice the charge symbols and locations, but do not name the particles yet. Use these observations as evidence in Particle Detective. The motion is a conceptual animation and does not represent a literal particle path.';
   markActivity('d2zoom');
 }
 
@@ -1124,36 +2102,45 @@ function initializeMcq(){
 }
 
 function initializeParticleMatch(){
-  document.querySelectorAll('.particle-token[draggable="true"]').forEach(btn=>{
+  document.querySelectorAll('.particle-choice').forEach(btn=>{
     btn.addEventListener('click',()=>{
-      selectedParticle=btn.dataset.particle;
-      document.querySelectorAll('.particle-token[draggable="true"]').forEach(b=>b.style.outline='');
-      btn.style.outline='2px solid var(--cyan)';
+      const target=btn.dataset.target,particle=btn.dataset.particle;
+      chooseParticle(target,particle,btn);
     });
-    btn.addEventListener('dragstart',e=>e.dataTransfer.setData('text/plain',btn.dataset.particle));
-  });
-  document.querySelectorAll('.dropzone').forEach(z=>{
-    z.addEventListener('dragover',e=>e.preventDefault());
-    z.addEventListener('drop',e=>{e.preventDefault();setMatch(z,e.dataTransfer.getData('text/plain'))});
-    z.addEventListener('click',()=>{if(selectedParticle)setMatch(z,selectedParticle)});
   });
 }
-function setMatch(zone,particle){
-  match[zone.dataset.target]=particle;
-  zone.querySelector('.matchvalue').textContent=particle;zone.classList.add('filled');save();
+function chooseParticle(target,particle,btn){
+  match[target]=particle;
+  state.match=match;
+  document.querySelectorAll(`.particle-choice[data-target="${target}"]`).forEach(b=>b.classList.remove('selected'));
+  if(btn)btn.classList.add('selected');
+  setText('match'+target,particle);
+  playActionSound();
+  save();
+}
+function restoreMatch(){
+  ['A','B','C'].forEach(target=>{
+    const val=match[target];
+    if(val){
+      setText('match'+target,val);
+      const btn=document.querySelector(`.particle-choice[data-target="${target}"][data-particle="${val}"]`);
+      if(btn)btn.classList.add('selected');
+    }
+  });
 }
 function resetParticleMatch(){
-  match={A:null,B:null,C:null};state.match=match;selectedParticle=null;
-  document.querySelectorAll('.dropzone').forEach(z=>{z.classList.remove('filled');z.querySelector('.matchvalue').textContent='—'});
-  document.querySelectorAll('.particle-token[draggable="true"]').forEach(b=>b.style.outline='');
-  document.getElementById('particleFeedback').className='hidden';save();
+  match={A:null,B:null,C:null};state.match=match;
+  document.querySelectorAll('.particle-choice').forEach(b=>b.classList.remove('selected'));
+  ['A','B','C'].forEach(target=>setText('match'+target,'—'));
+  document.getElementById('particleFeedback').className='hidden';
+  save();
 }
 function checkParticles(){
   const ok=match.A==='Proton'&&match.B==='Neutron'&&match.C==='Electron';
   gradeAttempt('d2particles',ok);
   showFb('particleFeedback',ok,ok
-    ?'A fits the proton evidence (+1, nucleus, about 1 u); B fits the neutron evidence (0, nucleus, about 1 u); C fits the electron evidence (−1, electron cloud, much smaller mass).'
-    :'Compare all three properties—not color alone. A proton is +1 in the nucleus, a neutron is neutral in the nucleus, and an electron is −1 in the electron cloud.');
+    ?'Excellent evidence matching. The proton is positive and found in the nucleus; the neutron is neutral and found in the nucleus; and the electron is negative and found in the electron cloud.'
+    :'Recheck each case file. Match all three clues—charge, location, and approximate mass—before choosing proton, neutron, or electron.');
 }
 function checkD2Q4(){
   const v=document.getElementById('d2q4').value.trim().toLowerCase();state.answers.d2q4=v;
@@ -1193,7 +2180,7 @@ function checkBuilder(){
 function buildPatternTable(){
   const body=document.getElementById('patternBody');body.innerHTML='';
   Object.entries(isotopes).forEach(([key,o])=>{
-    const tr=document.createElement('tr');tr.innerHTML=`<td>${o.name}</td><td>${o.z}</td><td>${o.a}</td>
+    const tr=document.createElement('tr');tr.innerHTML=`<td><div class="pattern-isotope"><div class="pattern-mini-tile"><span class="z">${o.z}</span><span class="a">${o.a}</span><span class="s">${o.symbol}</span></div><span class="pattern-isotope-name">${o.name}</span></div></td><td>${o.z}</td><td>${o.a}</td>
       <td><input type="number" id="${key}p" aria-label="${o.name} protons"></td>
       <td><input type="number" id="${key}n" aria-label="${o.name} neutrons"></td>
       <td><input type="number" id="${key}e" aria-label="${o.name} electrons"></td>`;
@@ -1289,7 +2276,7 @@ function loadAtomId(){
   const key=document.getElementById('isotopeSelect').value;const box=document.getElementById('atomIdInfo');
   if(!key){box.innerHTML='';return}
   const o=isotopes[key];
-  box.innerHTML=`<span class="stat">${o.name}</span><span class="stat">Symbol: <b>${o.symbol}</b></span><span class="stat">Atomic #: <b>${o.z}</b></span><span class="stat">Mass #: <b>${o.a}</b></span><span class="stat">Neutral atom</span>`;
+  box.innerHTML=atomIdPromptTileHTML(o);
 }
 function checkAtomId(){
   const key=document.getElementById('isotopeSelect').value;
@@ -1361,31 +2348,43 @@ function buildRemotePayload(day){
 function remoteStatusLabel(day){
   const r=state.remoteSubmissions?.[day];
   if(!r)return 'Not sent yet.';
-  if(r.status==='sent')return `Submission request sent ${formatCompletionTime(r.when)}. Check the Google Sheet if confirmation is needed.`;
+  if(r.status==='sent')return `Submission request sent ${formatCompletionTime(r.when)}. Check the Responses sheet for the recorded row.`;
   if(r.status==='sending')return 'Sending submission request…';
   if(r.status==='failed')return `Could not send. ${r.message||'Check the internet connection and Apps Script deployment.'}`;
   return 'Not sent yet.';
 }
 function refreshRemoteStatus(day){
-  const status=remoteStatusLabel(day);
+  const status=previewMode?'Preview mode — no Google Sheet submission is sent.':remoteStatusLabel(day);
   const daily=document.getElementById('completionRemoteStatus');
   const final=document.getElementById('finalRemoteStatus');
   if(daily)daily.textContent=status;
   if(final&&day===4)final.textContent=status;
 }
 async function submitToGoogleSheet(day,{force=false}={}){
+  if(previewMode)return false;
   state.remoteSubmissions=state.remoteSubmissions||{};
-  if(!force&&state.remoteSubmissions[day]?.status==='sent'){
+  const previous=state.remoteSubmissions[day];
+
+  if(!force &&
+     previous?.status==='sent' &&
+     previous?.version===REMOTE_SUBMISSION_VERSION){
     refreshRemoteStatus(day);
     return true;
   }
 
-  state.remoteSubmissions[day]={status:'sending',when:new Date().toISOString(),message:''};
+  state.remoteSubmissions[day]={
+    status:'sending',
+    when:new Date().toISOString(),
+    message:'',
+    version:REMOTE_SUBMISSION_VERSION
+  };
   save();
   refreshRemoteStatus(day);
 
   try{
     const payload=buildRemotePayload(day);
+    payload.submissionVersion=REMOTE_SUBMISSION_VERSION;
+
     await fetch(GOOGLE_SHEET_WEB_APP,{
       method:'POST',
       mode:'no-cors',
@@ -1394,12 +2393,11 @@ async function submitToGoogleSheet(day,{force=false}={}){
       body:JSON.stringify(payload)
     });
 
-    // no-cors returns an opaque response, so this means the request was sent,
-    // not that the Sheet row was independently verified by the browser.
     state.remoteSubmissions[day]={
       status:'sent',
       when:new Date().toISOString(),
-      message:'Submission request sent to Apps Script.'
+      message:'Submission request sent to Apps Script.',
+      version:REMOTE_SUBMISSION_VERSION
     };
     save();
     refreshRemoteStatus(day);
@@ -1408,7 +2406,8 @@ async function submitToGoogleSheet(day,{force=false}={}){
     state.remoteSubmissions[day]={
       status:'failed',
       when:new Date().toISOString(),
-      message:'Network or web-app access error.'
+      message:'Network or web-app access error.',
+      version:REMOTE_SUBMISSION_VERSION
     };
     save();
     refreshRemoteStatus(day);
@@ -1430,8 +2429,9 @@ function makeCompletionRecord(day){
 function showCompletion(day){
   const rec=state.completionRecords[day]||makeCompletionRecord(day);
   const d=new Date(rec.when);
-  setText('completionTitle',day===4?'Investigation Complete':`Day ${day} Complete`);
+  setText('completionTitle',`Day ${day} Complete`);
   setText('completionStudent',state.studentName);
+  setText('completionSection',state.section||'—');
   setText('completionWhen',d.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'})+' · '+d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'}));
   setText('completionMastery',rec.mastery+'%');
   document.getElementById('completionMeter').style.width=rec.mastery+'%';
@@ -1441,9 +2441,18 @@ function showCompletion(day){
   const retryBtn=document.getElementById('completionRetryBtn');
   if(retryBtn)retryBtn.dataset.day=String(day);
   refreshRemoteStatus(day);
+  activeCompletionDay=day;
   document.getElementById('completionModal').classList.remove('hidden');
 }
-function closeCompletion(){document.getElementById('completionModal').classList.add('hidden')}
+function closeCompletion(){
+  document.getElementById('completionModal').classList.add('hidden');
+  const shouldShowFinal=!previewMode && activeCompletionDay===4 && pendingFinalAfterDay4;
+  activeCompletionDay=null;
+  if(shouldShowFinal){
+    pendingFinalAfterDay4=false;
+    setTimeout(showFinalCompletion,120);
+  }
+}
 function showLatestCompletion(){
   if(state.day4Completed)showCompletion(4);
   else if(state.day3Completed)showCompletion(3);
@@ -1452,12 +2461,14 @@ function showLatestCompletion(){
 function completeDay2(){
   if(!day2Ready())return;
   state.day2Completed=true;save();makeCompletionRecord(2);showCompletion(2);
-  submitToGoogleSheet(2);
+  playCelebrateSound();
+  submitToGoogleSheet(2,{force:true});
 }
 function completeDay3(){
   if(!day3Ready())return;
   state.day3Completed=true;save();makeCompletionRecord(3);showCompletion(3);
-  submitToGoogleSheet(3);
+  playCelebrateSound();
+  submitToGoogleSheet(3,{force:true});
 }
 function completeDay4(){
   if(!day4Ready())return;
@@ -1465,8 +2476,10 @@ function completeDay4(){
   save();
   makeCompletionRecord(4);
   saveFinalSubmissionRecord();
-  showFinalCompletion();
-  submitToGoogleSheet(4);
+  pendingFinalAfterDay4=true;
+  showCompletion(4);
+  playCelebrateSound();
+  submitToGoogleSheet(4,{force:true});
 }
 
 function openPassword(day){
@@ -1520,6 +2533,8 @@ function showFinalCompletion(){
 
   const om=overallMastery();
   setText('finalMastery',om+'%');
+  const finalMeter=document.getElementById('finalMeter');
+  if(finalMeter)finalMeter.style.width=om+'%';
   setText('finalMasteryLevel',masteryLabel(om));
   setText('finalDay2',d2?formatCompletionTime(d2.when):'Completed');
   setText('finalDay3',d3?formatCompletionTime(d3.when):'Completed');
@@ -1531,10 +2546,127 @@ function showFinalCompletion(){
 }
 function closeFinalCompletion(){
   document.getElementById('finalCompletionModal').classList.add('hidden');
+  if(previewMode){go('day4');return}
   go('result');
 }
 
 
+
+
+
+function openPreviewCards(){
+  if(!previewMode)return;
+  document.getElementById('previewCardsModal').classList.remove('hidden');
+}
+function closePreviewCards(){
+  document.getElementById('previewCardsModal').classList.add('hidden');
+}
+function samplePreviewRecord(day){
+  const now=new Date().toISOString();
+  const mastery=day===2?88:day===3?92:90;
+  return {
+    day,
+    when:now,
+    mastery,
+    code:day===2?'PREVIEW-DAY3':day===3?'PREVIEW-DAY4':day===4?'PREVIEW-DAY4-COMPLETE':'PREVIEW-FINAL'
+  };
+}
+function previewCompletionCard(day){
+  if(!previewMode)return;
+  closePreviewCards();
+  state.completionRecords[day]=samplePreviewRecord(day);
+  setText('completionTitle',`Day ${day} Complete`);
+  setText('completionStudent','Teacher Preview');
+  setText('completionSection','Teacher Preview');
+  setText('completionWhen',formatCompletionTime(state.completionRecords[day].when));
+  setText('completionMastery',state.completionRecords[day].mastery+'%');
+  const meter=document.getElementById('completionMeter');
+  if(meter)meter.style.width=state.completionRecords[day].mastery+'%';
+  setText('completionLevel',masteryLabel(state.completionRecords[day].mastery));
+  setText('completionCodeLabel',day===4?'Preview of final submission code':'Preview of next-day password');
+  setText('completionPassword',state.completionRecords[day].code);
+  const retryBtn=document.getElementById('completionRetryBtn');
+  if(retryBtn)retryBtn.dataset.day=String(day);
+  refreshRemoteStatus(day);
+  activeCompletionDay=day;
+  document.getElementById('completionModal').classList.remove('hidden');
+}
+function previewFinalCard(){
+  if(!previewMode)return;
+  closePreviewCards();
+
+  state.day2Completed=true;
+  state.day3Completed=true;
+  state.day4Completed=true;
+  state.completionRecords[2]=samplePreviewRecord(2);
+  state.completionRecords[3]=samplePreviewRecord(3);
+  state.completionRecords[4]=samplePreviewRecord(4);
+
+  const d2=state.completionRecords[2],d3=state.completionRecords[3],d4=state.completionRecords[4];
+  setText('finalStudent','Teacher Preview');
+  setText('finalSection','Teacher Preview');
+  setText('finalWhen',formatCompletionTime(d4.when));
+
+  const mastery=90;
+  setText('finalMastery',mastery+'%');
+  const finalMeter=document.getElementById('finalMeter');
+  if(finalMeter)finalMeter.style.width=mastery+'%';
+  setText('finalMasteryLevel',masteryLabel(mastery));
+  setText('finalDay2',formatCompletionTime(d2.when));
+  setText('finalDay3',formatCompletionTime(d3.when));
+  setText('finalDay4',formatCompletionTime(d4.when));
+  setText('finalSubmissionCode','PREVIEW-FINAL');
+  refreshRemoteStatus(4);
+
+  document.getElementById('finalCompletionModal').classList.remove('hidden');
+}
+
+function openTeacherPreview(){
+  document.getElementById('teacherPreviewPasswordInput').value='';
+  document.getElementById('teacherPreviewFeedback').innerHTML='';
+  document.getElementById('teacherPreviewModal').classList.remove('hidden');
+  setTimeout(()=>document.getElementById('teacherPreviewPasswordInput').focus(),50);
+}
+function closeTeacherPreview(){
+  document.getElementById('teacherPreviewModal').classList.add('hidden');
+}
+async function verifyTeacherPreview(){
+  const entered=document.getElementById('teacherPreviewPasswordInput').value;
+  if(!entered){
+    showFb('teacherPreviewFeedback',false,'Enter the Teacher Preview password.');
+    return;
+  }
+  const digest=await sha256Hex(entered);
+  if(digest===null){
+    showFb('teacherPreviewFeedback',false,'Password verification requires a modern HTTPS browser.');
+    return;
+  }
+  if(digest!==TEACHER_PREVIEW_SHA256){
+    showFb('teacherPreviewFeedback',false,'The preview password is not correct.');
+    return;
+  }
+
+  previewMode=true;
+  closeTeacherPreview();
+
+  state.studentName='Teacher Preview';
+  state.section='Teacher Preview';
+  state.day3Access=true;
+  state.day4Access=true;
+
+  document.getElementById('topbar').classList.remove('hidden');
+  document.getElementById('previewBadge')?.classList.remove('hidden');
+  document.getElementById('previewCardsBtn')?.classList.remove('hidden');
+  document.getElementById('exitPreviewBtn')?.classList.remove('hidden');
+  document.getElementById('navDay3')?.classList.remove('locked');
+  document.getElementById('navDay4')?.classList.remove('locked');
+
+  updateUI();
+  go('day2');
+}
+function exitTeacherPreview(){
+  location.reload();
+}
 
 function openTeacherAccess(){
   document.getElementById('teacherPasswordInput').value='';
@@ -1677,25 +2809,46 @@ function renderResults(){
   setText('resultStatus',state.day4Completed?'Investigation Complete':'In Progress');
   const om=overallMastery();setText('resultMastery',om+'% · '+masteryLabel(om));
   const a=state.finalAtomId;
-  document.getElementById('resultAtomId').innerHTML=a?`<b>${a.name} (${a.symbol})</b><br>Atomic number: ${a.z}<br>Mass number: ${a.a}<br>Protons: ${a.p}<br>Neutrons: ${a.n}<br>Electrons: ${a.e}`:'No final Atom ID yet.';
+  document.getElementById('resultAtomId').innerHTML=a?periodicTileHTML(a):'No final Atom ID yet.';
   document.getElementById('resultReflection').textContent=state.reflection||'No reflection saved yet.';
 }
 function reviewAnswers(){if(state.day4Access)go('day4');else if(state.day3Access)go('day3');else go('day2')}
-function openReset(){document.getElementById('resetModal').classList.remove('hidden')}
-function closeReset(){document.getElementById('resetModal').classList.add('hidden')}
+function openReset(){
+  document.getElementById('resetModal').classList.remove('hidden');
+}
+function closeReset(){
+  document.getElementById('resetModal').classList.add('hidden');
+}
 function resetAll(){
+  // Preview mode is temporary; resetting here simply exits preview.
+  if(previewMode){
+    location.reload();
+    return;
+  }
+
   const key=profileKey(state.section,state.studentName);
   const profiles=readProfiles();
-  if(key&&profiles[key])delete profiles[key];
-  writeProfiles(profiles);
+
+  if(key && profiles[key]){
+    delete profiles[key];
+    writeProfiles(profiles);
+  }
+
   localStorage.removeItem(STORAGE_KEY);
   localStorage.removeItem(ACTIVE_PROFILE_KEY);
-  location.redocument.getElementById('teacherPasswordInput')?.addEventListener('keydown',e=>{if(e.key==='Enter')verifyTeacherPassword()});
-load();
+  location.reload();
 }
+
+document.getElementById('teacherPasswordInput')?.addEventListener('keydown',e=>{
+  if(e.key==='Enter')verifyTeacherPassword();
+});
+document.getElementById('teacherPreviewPasswordInput')?.addEventListener('keydown',e=>{
+  if(e.key==='Enter')verifyTeacherPreview();
+});
 
 // Build dynamic content before restoring saved field values.
 load();
+updateSoundToggle();
 buildPatternTable();
 initializeMcq();
 initializeParticleMatch();

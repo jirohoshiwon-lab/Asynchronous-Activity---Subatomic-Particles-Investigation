@@ -929,9 +929,9 @@ input:hover,select:hover,textarea:hover{
   <div class="topbar-inner">
     <div class="brand"><span class="brand-dot"></span> ATOM INVESTIGATION <span id="previewBadge" class="chip hidden" style="margin-left:8px">TEACHER PREVIEW MODE</span></div>
     <nav class="navwrap" aria-label="Mission navigation">
-      <button class="navbtn" id="navDay2" onclick="go('day2')">DAY 2</button>
-      <button class="navbtn locked" id="navDay3" onclick="go('day3')">DAY 3</button>
-      <button class="navbtn locked" id="navDay4" onclick="go('day4')">DAY 4</button>
+      <button class="navbtn" id="navDay2" onclick="go('day2')">DAY 1</button>
+      <button class="navbtn locked" id="navDay3" onclick="go('day3')">DAY 2</button>
+      <button class="navbtn locked" id="navDay4" onclick="go('day4')">DAY 3</button>
       <button class="navbtn" onclick="go('result')">RESULTS</button>
       <button class="navbtn hidden" id="previewCardsBtn" onclick="openPreviewCards()">PREVIEW CARDS</button>
       <button class="navbtn hidden" id="exitPreviewBtn" onclick="exitTeacherPreview()">EXIT PREVIEW</button>
@@ -976,7 +976,7 @@ input:hover,select:hover,textarea:hover{
         <button class="primary" onclick="beginInvestigation()">BEGIN / RESUME INVESTIGATION</button>
         <button class="ghost" onclick="openPassword()">I HAVE A DAY PASSWORD</button>
       </div>
-      <div class="science-note" style="margin-top:14px"><b>Automatic saving:</b> Your answers and completed activities are saved under your <b>section + name</b> on this device. At the end of each day, you will receive a password for the next day. After Day 4, you will receive a screenshot-ready <b>3-Day Completion Card</b>.</div>
+      <div class="science-note" style="margin-top:14px"><b>Automatic saving:</b> Your answers and completed activities are saved under your <b>section + name</b> on this device. At the end of each day, you will receive a password for the next day. After DAY 3, you will receive a screenshot-ready <b>3-Day Completion Card</b>.</div>
       <div class="note" style="margin-top:12px"><b>Student reminder:</b> Your final 3-Day Completion Card is your proof of completion.</div>
 
       <div class="teacher-corner" aria-label="Teacher tools">
@@ -988,14 +988,14 @@ input:hover,select:hover,textarea:hover{
 </section>
 
 <section id="day2Screen" class="screen hidden">
-  <div class="kicker">DAY 2 · ENGAGE</div>
+  <div class="kicker">DAY 1 · ENGAGE</div>
   <h2>Mission 1: Zoom Into the Atom</h2>
   <div class="instruction-box">
     <b>What to do today</b>
     <ol>
       <li>Complete the five activities below. They are independent, so you may work through them one at a time without losing earlier answers.</li>
       <li>Read every feedback message before trying again. The feedback is part of the lesson.</li>
-      <li>Your work saves automatically. When all required activities are complete, the <b>Finish Day 2</b> button will appear.</li>
+      <li>Your work saves automatically. When all required activities are complete, the <b>Finish DAY 1</b> button will appear.</li>
     </ol>
     <div class="day-status"><span class="status-pill" id="d2Status">0 activities completed</span><span class="status-pill">Autosave on</span></div>
   </div>
@@ -1172,7 +1172,7 @@ input:hover,select:hover,textarea:hover{
   </div>
 
   <div class="mission">
-    <div class="section-title"><span class="num">5</span><h3>Day 2 Exit Ticket</h3></div>
+    <div class="section-title"><span class="num">5</span><h3>DAY 1 Exit Ticket</h3></div>
     <p>What information best distinguishes proton, neutron, and electron in this investigation?</p>
     <div data-mcq="d2exit">
       <button class="choice" data-correct="false">Color, shape, and size</button>
@@ -1180,12 +1180,12 @@ input:hover,select:hover,textarea:hover{
       <button class="choice" data-correct="false">Element name</button>
       <button class="choice" data-correct="false">Atomic number only</button>
     </div>
-    <div id="day2Unlock" class="actions hidden"><button class="primary" onclick="completeDay2()">FINISH DAY 2 &amp; VIEW COMPLETION CARD</button></div>
+    <div id="day2Unlock" class="actions hidden"><button class="primary" onclick="completeDay2()">FINISH DAY 1 &amp; VIEW COMPLETION CARD</button></div>
   </div>
 </section>
 
 <section id="day3Screen" class="screen hidden">
-  <div class="kicker">DAY 3 · EXPLORE</div>
+  <div class="kicker">DAY 2 · EXPLORE</div>
   <h2>Mission 2: Build the Atom</h2>
   <p class="lead">Today you will investigate particle numbers and discover patterns before the formal rules are summarized.</p>
   <div class="instruction-box">
@@ -1198,7 +1198,7 @@ input:hover,select:hover,textarea:hover{
     <div class="day-status"><span class="status-pill" id="d3Status">0 activities completed</span><span class="status-pill">Autosave on</span></div>
   </div>
   <details class="card">
-    <summary><b>Science Term Guide — Day 3</b></summary>
+    <summary><b>Science Term Guide — DAY 2</b></summary>
     <div class="term-grid">
       <div class="term"><b>Atomic number</b><br>The number of protons in an atom. It identifies the element.</div>
       <div class="term"><b>Mass number</b><br>The total number of protons and neutrons in one specific isotope.</div>
@@ -1211,7 +1211,7 @@ input:hover,select:hover,textarea:hover{
 
   <div class="mission">
     <div class="section-title"><span class="num">1</span><h3>Build Neutral Aluminum-27</h3></div>
-    <div class="instruction-box"><b>Your task:</b> Use the three toolbox buttons to place particles into the model. Protons and neutrons belong in the nucleus; electrons belong in the electron cloud. Use the isotope tile and the neutral charge as clues. You may remove the last particle or reset this activity without affecting the other Day 3 activities.</div>
+    <div class="instruction-box"><b>Your task:</b> Use the three toolbox buttons to place particles into the model. Protons and neutrons belong in the nucleus; electrons belong in the electron cloud. Use the isotope tile and the neutral charge as clues. You may remove the last particle or reset this activity without affecting the other DAY 2 activities.</div>
     <div class="isotope-row">
       <div class="isotope-tile" aria-label="Aluminum-27 isotope tile">
       <div class="iso-z">13</div>
@@ -1298,12 +1298,12 @@ input:hover,select:hover,textarea:hover{
       <div class="iso-label">isotope tile</div>
     </div></div><p>Given: 15 protons, 16 neutrons, and 15 electrons.</p><label>Atomic Number</label><input type="number" id="cZ"><label>Mass Number</label><input type="number" id="cA"><button class="smallbtn" style="margin-top:8px" onclick="checkCodeC()">CHECK</button><div id="codeCfb"></div></div>
     </div>
-    <div id="day3Continue" class="actions hidden"><button class="primary" onclick="completeDay3()">FINISH DAY 3 &amp; VIEW COMPLETION CARD</button></div>
+    <div id="day3Continue" class="actions hidden"><button class="primary" onclick="completeDay3()">FINISH DAY 2 &amp; VIEW COMPLETION CARD</button></div>
   </div>
 </section>
 
 <section id="day4Screen" class="screen hidden">
-  <div class="kicker">DAY 4 · EXPLAIN</div>
+  <div class="kicker">DAY 3 · EXPLAIN</div>
   <h2>Mission 3: Crack the Atomic Code</h2>
   <div class="instruction-box">
     <b>What to do today</b>
@@ -1315,7 +1315,7 @@ input:hover,select:hover,textarea:hover{
     <div class="day-status"><span class="status-pill" id="d4Status">0 activities completed</span><span class="status-pill">Autosave on</span></div>
   </div>
   <details class="card">
-    <summary><b>Science Term Guide — Day 4</b></summary>
+    <summary><b>Science Term Guide — DAY 3</b></summary>
     <div class="term-grid">
       <div class="term"><b>Atomic number (Z)</b><br>The proton count. Two atoms with different proton counts are different elements.</div>
       <div class="term"><b>Mass number (A)</b><br>Protons + neutrons in one isotope. It is a whole number.</div>
@@ -1459,7 +1459,7 @@ input:hover,select:hover,textarea:hover{
     <label for="reflection">How do atomic number, mass number, and the numbers of protons, neutrons, and electrons help you describe a specific atom?</label>
     <textarea id="reflection" placeholder="Write 2–3 complete sentences."></textarea>
     <div class="actions"><button class="primary" onclick="saveReflection()">SAVE REFLECTION</button></div><div id="reflectionFb"></div>
-    <div id="completeMissionBtn" class="actions hidden"><button class="primary" onclick="completeDay4()">FINISH DAY 4 &amp; VIEW COMPLETION CARD</button></div>
+    <div id="completeMissionBtn" class="actions hidden"><button class="primary" onclick="completeDay4()">FINISH DAY 3 &amp; VIEW COMPLETION CARD</button></div>
   </div>
 </section>
 
@@ -1548,8 +1548,8 @@ input:hover,select:hover,textarea:hover{
     <p class="muted">Use the password shown on the completion card from the previous day. This allows each day to be treated as a separate session.</p>
     <label for="passwordDay">Day to unlock</label>
     <select id="passwordDay">
-      <option value="3">Day 3 — Explore</option>
-      <option value="4">Day 4 — Explain</option>
+      <option value="3">DAY 2 — Explore</option>
+      <option value="4">DAY 3 — Explain</option>
     </select>
     <label for="dayPassword" style="margin-top:12px">Password</label>
     <input id="dayPassword" autocomplete="off" placeholder="Enter password">
@@ -1603,17 +1603,17 @@ input:hover,select:hover,textarea:hover{
           <h3>Three-Day Completion Record</h3>
           <div class="day-timeline">
             <div class="day-step">
-              <div class="step-kicker">Day 2</div>
+              <div class="step-kicker">DAY 1</div>
               <div class="step-title">Engage</div>
               <div id="finalDay2" class="step-time"></div>
             </div>
             <div class="day-step">
-              <div class="step-kicker">Day 3</div>
+              <div class="step-kicker">DAY 2</div>
               <div class="step-title">Explore</div>
               <div id="finalDay3" class="step-time"></div>
             </div>
             <div class="day-step">
-              <div class="step-kicker">Day 4</div>
+              <div class="step-kicker">DAY 3</div>
               <div class="step-title">Explain</div>
               <div id="finalDay4" class="step-time"></div>
             </div>
@@ -1638,7 +1638,7 @@ input:hover,select:hover,textarea:hover{
   <div class="modal-box teacher-lock">
     <div class="kicker">TEACHER CONTENT CHECK</div>
     <h3 id="teacherPreviewTitle">Teacher Preview</h3>
-    <p class="muted">Enter the Teacher Preview password to unlock Day 2, Day 3, and Day 4 for content checking. Preview mode does not submit records to Google Sheets and does not overwrite student progress.</p>
+    <p class="muted">Enter the Teacher Preview password to unlock DAY 1, DAY 2, and DAY 3 for content checking. Preview mode does not submit records to Google Sheets and does not overwrite student progress.</p>
     <label for="teacherPreviewPasswordInput">Preview password</label>
     <input id="teacherPreviewPasswordInput" type="password" autocomplete="off" placeholder="Teacher preview password">
     <div id="teacherPreviewFeedback"></div>
@@ -1654,11 +1654,11 @@ input:hover,select:hover,textarea:hover{
   <div class="modal-box teacher-lock">
     <div class="kicker">TEACHER PREVIEW MODE</div>
     <h3 id="previewCardsTitle">Preview Completion Cards</h3>
-    <p class="muted">Open the Day 2, Day 3, Day 4, or final completion card without completing the activities. These preview cards use sample mastery data and are not saved or submitted.</p>
+    <p class="muted">Open the DAY 1, DAY 2, DAY 3, or final completion card without completing the activities. These preview cards use sample mastery data and are not saved or submitted.</p>
     <div class="actions" style="margin-top:16px">
-      <button class="ghost" onclick="previewCompletionCard(2)">DAY 2 CARD</button>
-      <button class="ghost" onclick="previewCompletionCard(3)">DAY 3 CARD</button>
-      <button class="ghost" onclick="previewCompletionCard(4)">DAY 4 CARD</button>
+      <button class="ghost" onclick="previewCompletionCard(2)">DAY 1 CARD</button>
+      <button class="ghost" onclick="previewCompletionCard(3)">DAY 2 CARD</button>
+      <button class="ghost" onclick="previewCompletionCard(4)">DAY 3 CARD</button>
       <button class="primary" onclick="previewFinalCard()">FINAL 3-DAY CARD</button>
     </div>
     <div class="actions">
@@ -1686,7 +1686,7 @@ input:hover,select:hover,textarea:hover{
   <div class="modal-box" style="max-width:1050px;max-height:92vh;overflow:auto">
     <div class="kicker">TEACHER DASHBOARD · LOCAL DEVICE RECORDS</div>
     <h2 id="teacherDashboardTitle">Atom Investigation Dashboard</h2>
-    <div class="note"><b>Google Sheet connection:</b> Student Day 2, Day 3, and final Day 4 completion records are configured to send to your Google Apps Script web app. This built-in dashboard still summarizes only profiles stored in <b>this browser/device</b>; use the connected Google Sheet for centralized records from different student devices.</div>
+    <div class="note"><b>Google Sheet connection:</b> Student DAY 1, DAY 2, and final DAY 3 completion records are configured to send to your Google Apps Script web app. This built-in dashboard still summarizes only profiles stored in <b>this browser/device</b>; use the connected Google Sheet for centralized records from different student devices.</div>
     <div class="card" style="margin-top:14px">
       <b>Google Sheet Connection Test</b>
       <p class="muted">Use this before giving the activity to students. It sends one test row to the connected Apps Script. Then check the <b>Responses</b> sheet.</p>
@@ -2812,7 +2812,7 @@ async function testGoogleSheetSubmission(){
 
 function exportTeacherCSV(){
   const rows=allProfileRows();
-  const head=['Section','Student','Status','Mastery Percent','Mastery Level','Day 2 Completed','Day 3 Completed','Day 4 Completed','Final Submission Code'];
+  const head=['Section','Student','Status','Mastery Percent','Mastery Level','DAY 1 Completed','DAY 2 Completed','DAY 3 Completed','Final Submission Code'];
   const lines=[head.map(csvEscape).join(',')];
   rows.forEach(p=>{
     const items=[...DAY_ITEMS[2],...DAY_ITEMS[3],...DAY_ITEMS[4]];

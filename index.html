@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Atom Investigation</title>
 <!-- Google Apps Script submission endpoint configured:
-     https://script.google.com/macros/s/AKfycbzcg3Laj_DgirMyFGORvSISydSoWu5fk8hW1-fuLG7AIoZS77MDTfAefLduHrBpkArSAA/exec
+     https://script.google.com/macros/s/AKfycbxr-yAlnsvAcZnEGC0Q3qACQXtaqTq655QKZwK_NWFxqM62fF3tHPxZH9zwdobmM9RKEw/exec
      IMPORTANT: Deploy the Apps Script web app with access settings that permit student browsers to call it.
      The browser uses no-cors POST requests, so "sent" means the request was dispatched, not independently verified. -->
 <!-- GitHub Pages classroom build with client-side Teacher Access.
@@ -976,7 +976,7 @@ input:hover,select:hover,textarea:hover{
         <button class="primary" onclick="beginInvestigation()">BEGIN / RESUME INVESTIGATION</button>
         <button class="ghost" onclick="openPassword()">I HAVE A DAY PASSWORD</button>
       </div>
-      <div class="science-note" style="margin-top:14px"><b>Automatic saving:</b> Your answers and completed activities are saved under your <b>section + name</b> on this device. At the end of each day, you will receive a password for the next day. After DAY 3, you will receive a screenshot-ready <b>3-Day Completion Card</b>.</div>
+      <div class="science-note" style="margin-top:14px"><b>Automatic saving:</b> Your answers and completed activities are saved under your <b>section + name</b> on this device. At the end of each day, you will receive a password for the next day. After Day 3, you will receive a screenshot-ready <b>3-Day Completion Card</b>.</div>
       <div class="note" style="margin-top:12px"><b>Student reminder:</b> Your final 3-Day Completion Card is your proof of completion.</div>
 
       <div class="teacher-corner" aria-label="Teacher tools">
@@ -995,7 +995,7 @@ input:hover,select:hover,textarea:hover{
     <ol>
       <li>Complete the five activities below. They are independent, so you may work through them one at a time without losing earlier answers.</li>
       <li>Read every feedback message before trying again. The feedback is part of the lesson.</li>
-      <li>Your work saves automatically. When all required activities are complete, the <b>Finish DAY 1</b> button will appear.</li>
+      <li>Your work saves automatically. When all required activities are complete, the <b>Finish Day 1</b> button will appear.</li>
     </ol>
     <div class="day-status"><span class="status-pill" id="d2Status">0 activities completed</span><span class="status-pill">Autosave on</span></div>
   </div>
@@ -1172,7 +1172,7 @@ input:hover,select:hover,textarea:hover{
   </div>
 
   <div class="mission">
-    <div class="section-title"><span class="num">5</span><h3>DAY 1 Exit Ticket</h3></div>
+    <div class="section-title"><span class="num">5</span><h3>Day 1 Exit Ticket</h3></div>
     <p>What information best distinguishes proton, neutron, and electron in this investigation?</p>
     <div data-mcq="d2exit">
       <button class="choice" data-correct="false">Color, shape, and size</button>
@@ -1198,7 +1198,7 @@ input:hover,select:hover,textarea:hover{
     <div class="day-status"><span class="status-pill" id="d3Status">0 activities completed</span><span class="status-pill">Autosave on</span></div>
   </div>
   <details class="card">
-    <summary><b>Science Term Guide — DAY 2</b></summary>
+    <summary><b>Science Term Guide — Day 2</b></summary>
     <div class="term-grid">
       <div class="term"><b>Atomic number</b><br>The number of protons in an atom. It identifies the element.</div>
       <div class="term"><b>Mass number</b><br>The total number of protons and neutrons in one specific isotope.</div>
@@ -1211,7 +1211,7 @@ input:hover,select:hover,textarea:hover{
 
   <div class="mission">
     <div class="section-title"><span class="num">1</span><h3>Build Neutral Aluminum-27</h3></div>
-    <div class="instruction-box"><b>Your task:</b> Use the three toolbox buttons to place particles into the model. Protons and neutrons belong in the nucleus; electrons belong in the electron cloud. Use the isotope tile and the neutral charge as clues. You may remove the last particle or reset this activity without affecting the other DAY 2 activities.</div>
+    <div class="instruction-box"><b>Your task:</b> Use the three toolbox buttons to place particles into the model. Protons and neutrons belong in the nucleus; electrons belong in the electron cloud. Use the isotope tile and the neutral charge as clues. You may remove the last particle or reset this activity without affecting the other Day 2 activities.</div>
     <div class="isotope-row">
       <div class="isotope-tile" aria-label="Aluminum-27 isotope tile">
       <div class="iso-z">13</div>
@@ -1315,7 +1315,7 @@ input:hover,select:hover,textarea:hover{
     <div class="day-status"><span class="status-pill" id="d4Status">0 activities completed</span><span class="status-pill">Autosave on</span></div>
   </div>
   <details class="card">
-    <summary><b>Science Term Guide — DAY 3</b></summary>
+    <summary><b>Science Term Guide — Day 3</b></summary>
     <div class="term-grid">
       <div class="term"><b>Atomic number (Z)</b><br>The proton count. Two atoms with different proton counts are different elements.</div>
       <div class="term"><b>Mass number (A)</b><br>Protons + neutrons in one isotope. It is a whole number.</div>
@@ -1548,8 +1548,8 @@ input:hover,select:hover,textarea:hover{
     <p class="muted">Use the password shown on the completion card from the previous day. This allows each day to be treated as a separate session.</p>
     <label for="passwordDay">Day to unlock</label>
     <select id="passwordDay">
-      <option value="3">DAY 2 — Explore</option>
-      <option value="4">DAY 3 — Explain</option>
+      <option value="3">Day 2 — Explore</option>
+      <option value="4">Day 3 — Explain</option>
     </select>
     <label for="dayPassword" style="margin-top:12px">Password</label>
     <input id="dayPassword" autocomplete="off" placeholder="Enter password">
@@ -1603,17 +1603,17 @@ input:hover,select:hover,textarea:hover{
           <h3>Three-Day Completion Record</h3>
           <div class="day-timeline">
             <div class="day-step">
-              <div class="step-kicker">DAY 1</div>
+              <div class="step-kicker">Day 1</div>
               <div class="step-title">Engage</div>
               <div id="finalDay2" class="step-time"></div>
             </div>
             <div class="day-step">
-              <div class="step-kicker">DAY 2</div>
+              <div class="step-kicker">Day 2</div>
               <div class="step-title">Explore</div>
               <div id="finalDay3" class="step-time"></div>
             </div>
             <div class="day-step">
-              <div class="step-kicker">DAY 3</div>
+              <div class="step-kicker">Day 3</div>
               <div class="step-title">Explain</div>
               <div id="finalDay4" class="step-time"></div>
             </div>
@@ -1638,7 +1638,7 @@ input:hover,select:hover,textarea:hover{
   <div class="modal-box teacher-lock">
     <div class="kicker">TEACHER CONTENT CHECK</div>
     <h3 id="teacherPreviewTitle">Teacher Preview</h3>
-    <p class="muted">Enter the Teacher Preview password to unlock DAY 1, DAY 2, and DAY 3 for content checking. Preview mode does not submit records to Google Sheets and does not overwrite student progress.</p>
+    <p class="muted">Enter the Teacher Preview password to unlock Day 1, Day 2, and Day 3 for content checking. Preview mode does not submit records to Google Sheets and does not overwrite student progress.</p>
     <label for="teacherPreviewPasswordInput">Preview password</label>
     <input id="teacherPreviewPasswordInput" type="password" autocomplete="off" placeholder="Teacher preview password">
     <div id="teacherPreviewFeedback"></div>
@@ -1654,7 +1654,7 @@ input:hover,select:hover,textarea:hover{
   <div class="modal-box teacher-lock">
     <div class="kicker">TEACHER PREVIEW MODE</div>
     <h3 id="previewCardsTitle">Preview Completion Cards</h3>
-    <p class="muted">Open the DAY 1, DAY 2, DAY 3, or final completion card without completing the activities. These preview cards use sample mastery data and are not saved or submitted.</p>
+    <p class="muted">Open the Day 1, Day 2, Day 3, or final completion card without completing the activities. These preview cards use sample mastery data and are not saved or submitted.</p>
     <div class="actions" style="margin-top:16px">
       <button class="ghost" onclick="previewCompletionCard(2)">DAY 1 CARD</button>
       <button class="ghost" onclick="previewCompletionCard(3)">DAY 2 CARD</button>
@@ -1686,7 +1686,7 @@ input:hover,select:hover,textarea:hover{
   <div class="modal-box" style="max-width:1050px;max-height:92vh;overflow:auto">
     <div class="kicker">TEACHER DASHBOARD · LOCAL DEVICE RECORDS</div>
     <h2 id="teacherDashboardTitle">Atom Investigation Dashboard</h2>
-    <div class="note"><b>Google Sheet connection:</b> Student DAY 1, DAY 2, and final DAY 3 completion records are configured to send to your Google Apps Script web app. This built-in dashboard still summarizes only profiles stored in <b>this browser/device</b>; use the connected Google Sheet for centralized records from different student devices.</div>
+    <div class="note"><b>Google Sheet connection:</b> Student Day 1, Day 2, and final Day 3 completion records are configured to send to your Google Apps Script web app. This built-in dashboard still summarizes only profiles stored in <b>this browser/device</b>; use the connected Google Sheet for centralized records from different student devices.</div>
     <div class="card" style="margin-top:14px">
       <b>Google Sheet Connection Test</b>
       <p class="muted">Use this before giving the activity to students. It sends one test row to the connected Apps Script. Then check the <b>Responses</b> sheet.</p>
@@ -1985,9 +1985,9 @@ function restoreCodes(){
   revealedCodes=saved.length;
 }
 function progress(){
-  if(state.day3Completed)return 100;
-  if(state.day2Completed)return 76;
-  if(state.day1Completed)return 42;
+  if(state.day4Completed)return 100;
+  if(state.day3Completed)return 76;
+  if(state.day2Completed)return 42;
   const done=Object.keys(state.activities).length;
   return Math.min(38,Math.round(done/8*38));
 }
@@ -2345,6 +2345,9 @@ function dayMastery(day){
   const items=DAY_ITEMS[day],hits=items.filter(id=>state.firstAttempts[id]===true).length;
   return Math.round(hits/items.length*100);
 }
+function visibleDayNumber(day){
+  return day===2?1:day===3?2:day===4?3:day;
+}
 function masteryLabel(p){
   if(p>=90)return 'Advanced Mastery';
   if(p>=80)return 'Proficient';
@@ -2364,7 +2367,7 @@ function buildRemotePayload(day){
     activity:'Atom Investigation',
     section:state.section||'',
     studentName:state.studentName||'',
-    day:`Day ${day}`,
+    day:`Day ${visibleDayNumber(day)}`,
     status:day===4?'Completed All 3 Days':'Completed',
     mastery,
     masteryLevel:masteryLabel(mastery),
@@ -2459,7 +2462,7 @@ function makeCompletionRecord(day){
 function showCompletion(day){
   const rec=state.completionRecords[day]||makeCompletionRecord(day);
   const d=new Date(rec.when);
-  setText('completionTitle',`Day ${day} Complete`);
+  setText('completionTitle',`Day ${visibleDayNumber(day)} Complete`);
   setText('completionStudent',state.studentName);
   setText('completionSection',state.section||'—');
   setText('completionWhen',d.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'})+' · '+d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'}));
@@ -2598,14 +2601,14 @@ function samplePreviewRecord(day){
     day,
     when:now,
     mastery,
-    code:day===2?'PREVIEW-DAY3':day===3?'PREVIEW-DAY4':day===4?'PREVIEW-DAY4-COMPLETE':'PREVIEW-FINAL'
+    code:day===2?'PREVIEW-DAY2':day===3?'PREVIEW-DAY3':day===4?'PREVIEW-DAY3-COMPLETE':'PREVIEW-FINAL'
   };
 }
 function previewCompletionCard(day){
   if(!previewMode)return;
   closePreviewCards();
   state.completionRecords[day]=samplePreviewRecord(day);
-  setText('completionTitle',`Day ${day} Complete`);
+  setText('completionTitle',`Day ${visibleDayNumber(day)} Complete`);
   setText('completionStudent','Teacher Preview');
   setText('completionSection','Teacher Preview');
   setText('completionWhen',formatCompletionTime(state.completionRecords[day].when));
@@ -2812,7 +2815,7 @@ async function testGoogleSheetSubmission(){
 
 function exportTeacherCSV(){
   const rows=allProfileRows();
-  const head=['Section','Student','Status','Mastery Percent','Mastery Level','DAY 1 Completed','DAY 2 Completed','DAY 3 Completed','Final Submission Code'];
+  const head=['Section','Student','Status','Mastery Percent','Mastery Level','Day 1 Completed','Day 2 Completed','Day 3 Completed','Final Submission Code'];
   const lines=[head.map(csvEscape).join(',')];
   rows.forEach(p=>{
     const items=[...DAY_ITEMS[2],...DAY_ITEMS[3],...DAY_ITEMS[4]];

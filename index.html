@@ -4,6 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Atom Investigation</title>
+<!-- Google Apps Script submission endpoint configured:
+     https://script.google.com/macros/s/AKfycbxr-yAlnsvAcZnEGC0Q3qACQXtaqTq655QKZwK_NWFxqM62fF3tHPxZH9zwdobmM9RKEw/exec
+     IMPORTANT: Deploy the Apps Script web app with access settings that permit student browsers to call it.
+     The browser uses no-cors POST requests, so "sent" means the request was dispatched, not independently verified. -->
 <!-- GitHub Pages classroom build with client-side Teacher Access.
      Do NOT embed teacher dashboard credentials, admin links, Google Sheet IDs with write permissions,
      or teacher-only controls in this file. The teacher password is checked client-side. This deters ordinary access but is not equivalent to server-side authentication. -->
@@ -691,6 +695,7 @@ hr{border:none;border-top:1px solid var(--line);margin:26px 0}
         <div class="card"><b>Completed</b><div id="completionWhen"></div></div>
         <div class="card"><b>First-attempt mastery</b><div id="completionMastery" class="subtitle"></div><div class="mastery-meter"><span id="completionMeter"></span></div><div id="completionLevel"></div></div>
         <div class="card"><b id="completionCodeLabel">Next-day password</b><div id="completionPassword" class="subtitle"></div></div>
+        <div class="card"><b>Google Sheet Submission</b><div id="completionRemoteStatus">Not sent yet</div><button class="smallbtn no-print" id="completionRetryBtn" style="margin-top:8px" onclick="retryRemoteSubmission()">RETRY SUBMISSION</button></div>
       </div>
       <div class="password-box" style="margin-top:16px"><b>Teacher proof:</b> Take a screenshot of this entire card. It records the student name, completion date and time, mastery level, and next-day password or final submission code.</div>
     </div>
@@ -744,6 +749,12 @@ hr{border:none;border-top:1px solid var(--line);margin:26px 0}
         <div id="finalSubmissionCode" class="subtitle" style="font-size:1.45rem;margin-top:4px"></div>
       </div>
 
+      <div class="card" style="margin-top:14px">
+        <b>Google Sheet Submission</b>
+        <div id="finalRemoteStatus">Not sent yet</div>
+        <button class="smallbtn no-print" style="margin-top:8px" onclick="retryRemoteSubmission(4)">RETRY FINAL SUBMISSION</button>
+      </div>
+
       <div class="science-note" style="margin-top:14px">
         <b>Show your teacher:</b> Take a screenshot of this entire card. It includes your name, section, completion date and time, mastery level, three-day record, and final submission code. The teacher's class dashboard is maintained separately and cannot be opened from the student website.
       </div>
@@ -775,7 +786,7 @@ hr{border:none;border-top:1px solid var(--line);margin:26px 0}
   <div class="modal-box" style="max-width:1050px;max-height:92vh;overflow:auto">
     <div class="kicker">TEACHER DASHBOARD · LOCAL DEVICE RECORDS</div>
     <h2 id="teacherDashboardTitle">Atom Investigation Dashboard</h2>
-    <div class="note"><b>Important limitation:</b> Because this GitHub Pages activity is a static site, this dashboard can only read student profiles stored in <b>this browser on this device</b>. Students using other devices will not automatically appear here unless a central service such as Google Sheets/Apps Script is connected later.</div>
+    <div class="note"><b>Google Sheet connection:</b> Student Day 2, Day 3, and final Day 4 completion records are configured to send to your Google Apps Script web app. This built-in dashboard still summarizes only profiles stored in <b>this browser/device</b>; use the connected Google Sheet for centralized records from different student devices.</div>
 
     <div class="teacher-dashboard-grid">
       <div class="teacher-stat">Student Profiles<b id="teacherTotalProfiles">0</b></div>
@@ -801,7 +812,8 @@ hr{border:none;border-top:1px solid var(--line);margin:26px 0}
 
     <div class="actions">
       <button class="ghost" onclick="closeTeacherDashboard()">CLOSE</button>
-      <button class="primary" onclick="exportTeacherCSV()">EXPORT CSV</button>
+      <button class="ghost" onclick="window.open(GOOGLE_SHEET_WEB_APP,'_blank','noopener')">TEST APPS SCRIPT URL</button>
+      <button class="primary" onclick="exportTeacherCSV()">EXPORT LOCAL CSV</button>
     </div>
   </div>
 </div>
@@ -819,6 +831,7 @@ const STORAGE_KEY='atomInvestigationStateV4';
 const PROFILE_STORE_KEY='atomInvestigationProfilesV4';
 const ACTIVE_PROFILE_KEY='atomInvestigationActiveProfileV4';
 const TEACHER_PASSWORD_SHA256='226b7c586aa685f8e6af0ce85ad7f67e90c4e6f43fddd29c8b2202af89ff77e7';
+const GOOGLE_SHEET_WEB_APP='https://script.google.com/macros/s/AKfycbxr-yAlnsvAcZnEGC0Q3qACQXtaqTq655QKZwK_NWFxqM62fF3tHPxZH9zwdobmM9RKEw/exec';
 
 const DAY_ITEMS={
   2:['d2particles','d2q1','d2q2','d2q3','d2q4','d2exit'],
@@ -840,7 +853,7 @@ let state={
   day2Completed:false,day3Completed:false,day4Completed:false,
   day3Access:false,day4Access:false,
   activities:{},autoCorrect:{},firstAttempts:{},answers:{},mcq:{},
-  reflection:'',finalAtomId:null,completionRecords:{},
+  reflection:'',finalAtomId:null,completionRecords:{},remoteSubmissions:{},
   builder:{p:0,n:0,e:0,order:[]},match:{A:null,B:null,C:null}
 };
 let selectedParticle=null;
@@ -915,7 +928,7 @@ function load(){
 
   if(loaded) state={...state,...loaded,
     activities:loaded.activities||{},autoCorrect:loaded.autoCorrect||{},firstAttempts:loaded.firstAttempts||{},
-    answers:loaded.answers||{},mcq:loaded.mcq||{},completionRecords:loaded.completionRecords||{},
+    answers:loaded.answers||{},mcq:loaded.mcq||{},completionRecords:loaded.completionRecords||{},remoteSubmissions:loaded.remoteSubmissions||{},
     builder:loaded.builder||{p:0,n:0,e:0,order:[]},match:loaded.match||{A:null,B:null,C:null}
   };
 
@@ -1016,7 +1029,7 @@ function beginInvestigation(){
     const p=profiles[key];
     state={...state,...p,
       activities:p.activities||{},autoCorrect:p.autoCorrect||{},firstAttempts:p.firstAttempts||{},
-      answers:p.answers||{},mcq:p.mcq||{},completionRecords:p.completionRecords||{},
+      answers:p.answers||{},mcq:p.mcq||{},completionRecords:p.completionRecords||{},remoteSubmissions:p.remoteSubmissions||{},
       builder:p.builder||{p:0,n:0,e:0,order:[]},match:p.match||{A:null,B:null,C:null}
     };
     builder=state.builder;match=state.match;
@@ -1026,7 +1039,7 @@ function beginInvestigation(){
       day2Completed:false,day3Completed:false,day4Completed:false,
       day3Access:false,day4Access:false,
       activities:{},autoCorrect:{},firstAttempts:{},answers:{},mcq:{},
-      reflection:'',finalAtomId:null,completionRecords:{},
+      reflection:'',finalAtomId:null,completionRecords:{},remoteSubmissions:{},
       builder:{p:0,n:0,e:0,order:[]},match:{A:null,B:null,C:null}
     };
     builder=state.builder;match=state.match;
@@ -1318,6 +1331,87 @@ function overallMastery(){
   const hits=items.filter(id=>state.firstAttempts[id]===true).length;
   return Math.round(hits/items.length*100);
 }
+
+function buildRemotePayload(day){
+  const rec=state.completionRecords?.[day]||{};
+  const mastery=day===4?overallMastery():dayMastery(day);
+  return {
+    activity:'Atom Investigation',
+    section:state.section||'',
+    studentName:state.studentName||'',
+    day:`Day ${day}`,
+    status:day===4?'Completed All 3 Days':'Completed',
+    mastery,
+    masteryLevel:masteryLabel(mastery),
+    submissionCode:day===4?(rec.code||submissionCode()):(rec.code||''),
+    completedAt:rec.when||new Date().toISOString(),
+    day2Completed:!!state.day2Completed,
+    day3Completed:!!state.day3Completed,
+    day4Completed:!!state.day4Completed
+  };
+}
+function remoteStatusLabel(day){
+  const r=state.remoteSubmissions?.[day];
+  if(!r)return 'Not sent yet.';
+  if(r.status==='sent')return `Submission request sent ${formatCompletionTime(r.when)}. Check the Google Sheet if confirmation is needed.`;
+  if(r.status==='sending')return 'Sending submission request…';
+  if(r.status==='failed')return `Could not send. ${r.message||'Check the internet connection and Apps Script deployment.'}`;
+  return 'Not sent yet.';
+}
+function refreshRemoteStatus(day){
+  const status=remoteStatusLabel(day);
+  const daily=document.getElementById('completionRemoteStatus');
+  const final=document.getElementById('finalRemoteStatus');
+  if(daily)daily.textContent=status;
+  if(final&&day===4)final.textContent=status;
+}
+async function submitToGoogleSheet(day,{force=false}={}){
+  state.remoteSubmissions=state.remoteSubmissions||{};
+  if(!force&&state.remoteSubmissions[day]?.status==='sent'){
+    refreshRemoteStatus(day);
+    return true;
+  }
+
+  state.remoteSubmissions[day]={status:'sending',when:new Date().toISOString(),message:''};
+  save();
+  refreshRemoteStatus(day);
+
+  try{
+    const payload=buildRemotePayload(day);
+    await fetch(GOOGLE_SHEET_WEB_APP,{
+      method:'POST',
+      mode:'no-cors',
+      cache:'no-store',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify(payload)
+    });
+
+    // no-cors returns an opaque response, so this means the request was sent,
+    // not that the Sheet row was independently verified by the browser.
+    state.remoteSubmissions[day]={
+      status:'sent',
+      when:new Date().toISOString(),
+      message:'Submission request sent to Apps Script.'
+    };
+    save();
+    refreshRemoteStatus(day);
+    return true;
+  }catch(error){
+    state.remoteSubmissions[day]={
+      status:'failed',
+      when:new Date().toISOString(),
+      message:'Network or web-app access error.'
+    };
+    save();
+    refreshRemoteStatus(day);
+    return false;
+  }
+}
+function retryRemoteSubmission(day){
+  const target=day||Number(document.getElementById('completionRetryBtn')?.dataset.day||4);
+  submitToGoogleSheet(target,{force:true});
+}
+
 function makeCompletionRecord(day){
   const rec={
     day,when:new Date().toISOString(),mastery:dayMastery(day),section:state.section,
@@ -1336,6 +1430,9 @@ function showCompletion(day){
   setText('completionLevel',masteryLabel(rec.mastery));
   setText('completionCodeLabel',day===4?'Final submission code':'Password for the next day');
   setText('completionPassword',rec.code);
+  const retryBtn=document.getElementById('completionRetryBtn');
+  if(retryBtn)retryBtn.dataset.day=String(day);
+  refreshRemoteStatus(day);
   document.getElementById('completionModal').classList.remove('hidden');
 }
 function closeCompletion(){document.getElementById('completionModal').classList.add('hidden')}
@@ -1347,10 +1444,12 @@ function showLatestCompletion(){
 function completeDay2(){
   if(!day2Ready())return;
   state.day2Completed=true;save();makeCompletionRecord(2);showCompletion(2);
+  submitToGoogleSheet(2);
 }
 function completeDay3(){
   if(!day3Ready())return;
   state.day3Completed=true;save();makeCompletionRecord(3);showCompletion(3);
+  submitToGoogleSheet(3);
 }
 function completeDay4(){
   if(!day4Ready())return;
@@ -1359,6 +1458,7 @@ function completeDay4(){
   makeCompletionRecord(4);
   saveFinalSubmissionRecord();
   showFinalCompletion();
+  submitToGoogleSheet(4);
 }
 
 function openPassword(day){
@@ -1417,6 +1517,7 @@ function showFinalCompletion(){
   setText('finalDay3',d3?formatCompletionTime(d3.when):'Completed');
   setText('finalDay4',d4?formatCompletionTime(d4.when):formatCompletionTime(finalRec.when));
   setText('finalSubmissionCode',d4?.code||submissionCode());
+  refreshRemoteStatus(4);
 
   document.getElementById('finalCompletionModal').classList.remove('hidden');
 }

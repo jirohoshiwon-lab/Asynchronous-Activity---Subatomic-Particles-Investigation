@@ -241,6 +241,7 @@ hr{border:none;border-top:1px solid var(--line);margin:26px 0}
 <header class="topbar hidden" id="topbar">
   <div class="topbar-inner">
     <div class="brand"><span class="brand-dot"></span> ATOM INVESTIGATION</div>
+    <div class="muted" style="font-size:.78rem;margin-left:10px">Build v9 · GitHub + Google Sheets Connected</div>
     <nav class="navwrap" aria-label="Mission navigation">
       <button class="navbtn" id="navDay2" onclick="go('day2')">DAY 2</button>
       <button class="navbtn locked" id="navDay3" onclick="go('day3')">DAY 3</button>
@@ -787,6 +788,14 @@ hr{border:none;border-top:1px solid var(--line);margin:26px 0}
     <div class="kicker">TEACHER DASHBOARD · LOCAL DEVICE RECORDS</div>
     <h2 id="teacherDashboardTitle">Atom Investigation Dashboard</h2>
     <div class="note"><b>Google Sheet connection:</b> Student Day 2, Day 3, and final Day 4 completion records are configured to send to your Google Apps Script web app. This built-in dashboard still summarizes only profiles stored in <b>this browser/device</b>; use the connected Google Sheet for centralized records from different student devices.</div>
+    <div class="card" style="margin-top:14px">
+      <b>Google Sheet Connection Test</b>
+      <p class="muted">Use this before giving the activity to students. It sends one test row to the connected Apps Script. Then check the <b>Responses</b> sheet.</p>
+      <div id="teacherSheetTestStatus">No test sent yet.</div>
+      <div class="actions">
+        <button class="primary" onclick="testGoogleSheetSubmission()">TEST GOOGLE SHEET SUBMISSION</button>
+      </div>
+    </div>
 
     <div class="teacher-dashboard-grid">
       <div class="teacher-stat">Student Profiles<b id="teacherTotalProfiles">0</b></div>
@@ -1608,6 +1617,38 @@ function csvEscape(v){
   const s=String(v??'');
   return /[",\n]/.test(s)?`"${s.replace(/"/g,'""')}"`:s;
 }
+
+async function testGoogleSheetSubmission(){
+  const el=document.getElementById('teacherSheetTestStatus');
+  if(el)el.textContent='Sending test submission…';
+  const payload={
+    activity:'Atom Investigation',
+    section:'TEACHER TEST',
+    studentName:'Connection Test',
+    day:'Test',
+    status:'Connection Test',
+    mastery:'',
+    masteryLevel:'',
+    submissionCode:'TEST-'+Date.now().toString().slice(-6),
+    completedAt:new Date().toISOString(),
+    day2Completed:false,
+    day3Completed:false,
+    day4Completed:false
+  };
+  try{
+    await fetch(GOOGLE_SHEET_WEB_APP,{
+      method:'POST',
+      mode:'no-cors',
+      cache:'no-store',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify(payload)
+    });
+    if(el)el.innerHTML='<b>Test request sent.</b> Now open your Google Sheet and look for a new row with Section = TEACHER TEST and Student Name = Connection Test.';
+  }catch(error){
+    if(el)el.innerHTML='<b>Test failed to send.</b> Check your internet connection and Apps Script deployment settings.';
+  }
+}
+
 function exportTeacherCSV(){
   const rows=allProfileRows();
   const head=['Section','Student','Status','Mastery Percent','Mastery Level','Day 2 Completed','Day 3 Completed','Day 4 Completed','Final Submission Code'];
